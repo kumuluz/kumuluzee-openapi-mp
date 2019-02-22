@@ -74,7 +74,7 @@ java -jar target/${project.build.finalName}.jar
 
 After startup API specification will be available at:
 
-**http://<-hostname-:<-port->/openapi**
+**http://<-hostname->:<-port->/openapi**
 
 Example:
 

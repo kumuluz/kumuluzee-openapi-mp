@@ -1,0 +1,14 @@
+<web-app>
+    <servlet>
+        <servlet-name>org.eclipse.microprofile.openapi.apps.airlines.JAXRSApp</servlet-name>
+        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>jersey.config.server.resource.validation.disable</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>org.eclipse.microprofile.openapi.apps.airlines.JAXRSApp</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+</web-app>

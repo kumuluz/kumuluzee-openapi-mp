@@ -1,6 +1,6 @@
 # Contributing to KumuluzEE OpenAPI MicroProfile
 
-♥ [KumuluzEE OpenAPI](https://github.com/kumuluz/kumuluzee-openapi-mp) and want to get involved?
+♥ [KumuluzEE OpenAPI MicroProfile](https://github.com/kumuluz/kumuluzee-openapi-mp) and want to get involved?
 Thanks! There are plenty of ways you can help!
 
 ## Bugs

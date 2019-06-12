@@ -26,13 +26,12 @@ import com.kumuluz.ee.common.dependencies.EeComponentDependency;
 import com.kumuluz.ee.common.dependencies.EeComponentType;
 import com.kumuluz.ee.common.dependencies.EeExtensionDef;
 import com.kumuluz.ee.common.exceptions.KumuluzServerException;
+import com.kumuluz.ee.common.utils.ResourceUtils;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.jetty.JettyServletServer;
-import io.github.classgraph.ClassGraph;
-import io.github.classgraph.ClassInfo;
-import io.github.classgraph.ClassInfoList;
-import io.github.classgraph.ScanResult;
+import com.kumuluz.ee.openapi.mp.utils.JarUtils;
+import io.github.classgraph.*;
 import io.smallrye.openapi.api.OpenApiConfig;
 import io.smallrye.openapi.api.OpenApiConfigImpl;
 import io.smallrye.openapi.api.OpenApiDocument;
@@ -40,11 +39,14 @@ import io.smallrye.openapi.runtime.OpenApiProcessor;
 import io.smallrye.openapi.runtime.OpenApiStaticFile;
 import io.smallrye.openapi.runtime.io.OpenApiSerializer;
 import org.eclipse.microprofile.config.ConfigProvider;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.jboss.jandex.Index;
 import org.jboss.jandex.Indexer;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -93,10 +95,62 @@ public class OpenApiMpExtension implements Extension {
         }
     }
 
-    private Index getIndex(OpenApiConfig config, ClassLoader classLoader) {
-        Indexer indexer = new Indexer();
+    private Index getIndex(OpenApiConfig config) {
+
         ClassGraph classGraph = new ClassGraph().enableClassInfo();
+
+        if (ConfigurationUtil.getInstance().getBoolean("kumuluzee.openapi.scanning.debug").orElse(false)) {
+            classGraph = classGraph.verbose();
+        }
+
+        // disable Jersey wadl
         classGraph.blacklistPackages("org.glassfish.jersey.server.wadl");
+        // disable Jersey ResourceConfig
+        classGraph.blacklistClasses(ResourceConfig.class.getName());
+
+        if (ConfigurationUtil.getInstance().getBoolean("kumuluzee.openapi.scanning.optimize").orElse(true)) {
+            List<String> scanJars = new LinkedList<>(); // which jars should ClassGraph scan
+
+            // if in jar add main jar name
+            if (ResourceUtils.isRunningInJar()) {
+                try {
+
+                    Class.forName("com.kumuluz.ee.loader.EeClassLoader");
+                    scanJars.add(JarUtils.getMainJarName());
+
+                } catch (ClassNotFoundException e) {
+                    // this should not fail since we check if we are running in jar beforehand
+                    // if you get this warning you are probably doing something weird with packaging
+                    LOG.warning("Could not load EeClassLoader, OpenAPI specification may not work as expected. " +
+                            "Are you running in UberJAR created by KumuluzEE Maven plugin?");
+                }
+            }
+
+            // add jars from kumuluzee.dev.scan-libraries configuration
+            List<String> scanLibraries = EeConfig.getInstance().getDev().getScanLibraries();
+            if (scanLibraries != null) {
+                scanJars.addAll(scanLibraries);
+            }
+
+            if (scanJars.isEmpty()) {
+                // running exploded with no scan-libraries defined in config
+                classGraph.disableJarScanning();
+            } else {
+                // running in jar or scan-libraries defined in config
+                for (String scanJar : scanJars) {
+                    // scan-libraries allows two formats:
+                    // - artifact-1.0.0-SNAPSHOT.jar
+                    // - artifact
+                    if (scanJar.endsWith(".jar")) {
+                        classGraph.whitelistJars(scanJar);
+                    } else {
+                        classGraph.whitelistJars(scanJar + "-*.jar");
+                    }
+                }
+            }
+        }
+
+        // include/exclude according to configuration defined in MP spec
         for(String c: config.scanClasses()) {
             LOG.info("Including class: " + c);
             classGraph.whitelistClasses(c);
@@ -114,7 +168,11 @@ public class OpenApiMpExtension implements Extension {
             classGraph.blacklistPackages(p);
         }
         ScanResult scanResult = classGraph.scan();
+
         ClassInfoList classInfoList = scanResult.getAllClasses();
+        Indexer indexer = new Indexer();
+        ClassLoader classLoader = getClass().getClassLoader();
+
         for(ClassInfo classInfo: classInfoList) {
             try {
                 indexer.index(classLoader.getResourceAsStream(classInfo.getName().replaceAll("\\.", "/") + ".class"));
@@ -123,6 +181,7 @@ public class OpenApiMpExtension implements Extension {
             }
         }
         scanResult.close();
+
         return indexer.complete();
     }
 
@@ -136,7 +195,7 @@ public class OpenApiMpExtension implements Extension {
         openApiDocument.modelFromReader(OpenApiProcessor.modelFromReader(config, classLoader));
         openApiDocument.modelFromStaticFile(OpenApiProcessor.modelFromStaticFile(getStaticFiles()));
         if(!config.scanDisable()) {
-            openApiDocument.modelFromAnnotations(OpenApiProcessor.modelFromAnnotations(config, getIndex(config, classLoader)));
+            openApiDocument.modelFromAnnotations(OpenApiProcessor.modelFromAnnotations(config, getIndex(config)));
         }
         openApiDocument.filter(OpenApiProcessor.getFilter(config, classLoader));
         openApiDocument.initialize();

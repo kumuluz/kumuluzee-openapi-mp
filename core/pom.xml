@@ -30,6 +30,13 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.kumuluz.ee</groupId>
+            <artifactId>kumuluzee-loader</artifactId>
+            <version>${kumuluzee.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>com.kumuluz.ee.config</groupId>
             <artifactId>kumuluzee-config-mp</artifactId>
             <scope>provided</scope>
@@ -97,9 +104,6 @@
                     <environmentVariables>
                         <PORT>9080</PORT>
                     </environmentVariables>
-                    <systemProperties>
-
-                    </systemProperties>
                 </configuration>
             </plugin>
         </plugins>

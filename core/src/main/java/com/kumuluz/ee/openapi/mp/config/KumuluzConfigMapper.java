@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Configuration source that maps mp.openapi configuration properties to kumuluzee.openapi.
+ * Configuration source that maps mp.openapi configuration properties to kumuluzee.openapi-mp.
  *
  * @author Urban Malc
  * @since 1.0.0

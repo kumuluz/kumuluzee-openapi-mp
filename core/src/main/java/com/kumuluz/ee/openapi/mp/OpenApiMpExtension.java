@@ -99,7 +99,7 @@ public class OpenApiMpExtension implements Extension {
 
         ClassGraph classGraph = new ClassGraph().enableClassInfo();
 
-        if (ConfigurationUtil.getInstance().getBoolean("kumuluzee.openapi.scanning.debug").orElse(false)) {
+        if (ConfigurationUtil.getInstance().getBoolean("kumuluzee.openapi-mp.scanning.debug").orElse(false)) {
             classGraph = classGraph.verbose();
         }
 
@@ -108,7 +108,7 @@ public class OpenApiMpExtension implements Extension {
         // disable Jersey ResourceConfig
         classGraph.blacklistClasses(ResourceConfig.class.getName());
 
-        if (ConfigurationUtil.getInstance().getBoolean("kumuluzee.openapi.scanning.optimize").orElse(true)) {
+        if (ConfigurationUtil.getInstance().getBoolean("kumuluzee.openapi-mp.scanning.optimize").orElse(true)) {
             List<String> scanJars = new LinkedList<>(); // which jars should ClassGraph scan
 
             // if in jar add main jar name
@@ -203,7 +203,7 @@ public class OpenApiMpExtension implements Extension {
         if (kumuluzServerWrapper.getServer() instanceof JettyServletServer) {
             JettyServletServer server = (JettyServletServer) kumuluzServerWrapper.getServer();
 
-            // will get mapped to kumuluzee.openapi.servlet.mapping as well
+            // will get mapped to kumuluzee.openapi-mp.servlet.mapping as well
             String mapping = ConfigurationUtil.getInstance().get("mp.openapi.servlet.mapping").orElse("/openapi");
 
             server.registerServlet(OpenApiMPServlet.class, mapping);
@@ -214,7 +214,7 @@ public class OpenApiMpExtension implements Extension {
     public boolean isEnabled() {
         ConfigurationUtil config = ConfigurationUtil.getInstance();
         return config.getBoolean("mp.openapi.enabled")
-                .orElse(config.getBoolean("kumuluzee.openapi.enabled")
+                .orElse(config.getBoolean("kumuluzee.openapi-mp.enabled")
                         .orElse(true));
     }
 }

@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>kumuluzee-openapi-mp-ui</artifactId>
-    <name>KumuluzEE OpenAPI MP UI</name>
+    <name>KumuluzEE OpenAPI MicroProfile UI</name>
 
     <dependencies>
         <dependency>

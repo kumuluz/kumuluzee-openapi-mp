@@ -35,7 +35,7 @@ MicroProfile OpenAPI annotations.
 @SecurityScheme(securitySchemeName = "openid-connect", type = SecuritySchemeType.OPENIDCONNECT,
         openIdConnectUrl = "http://auth-server-url/.well-known/openid-configuration")
 @ApplicationPath("v2")
-@OpenAPIDefinition(info = @Info(title = "CustomerApi", version = "v2.0.0", contact = @Contact(), license = @License(name="something")), servers = @Server(url = "http://localhost:8080/v2"), security
+@OpenAPIDefinition(info = @Info(title = "CustomerApi", version = "v2.0.0", contact = @Contact(), license = @License(name="something")), servers = @Server(url = "http://localhost:8080"), security
         = @SecurityRequirement(name = "openid-connect"))
 public class CustomerApplication extends Application {
 }
@@ -96,7 +96,7 @@ kumuluzee:
       mapping: /openapi-custom-mapping
     scan:
       packages: com.kumuluz.ee.samples.openapi
-    servers: https://example-api.com/v1,https://my-proxy.com/v1
+    servers: https://example-api.com,https://my-proxy.com
 ```
 
 Some interesting configuration properties are:
@@ -108,6 +108,62 @@ Some interesting configuration properties are:
 
 Full list of configuration properties can be found in
 [MicroProfile OpenAPI specification](https://github.com/eclipse/microprofile-open-api/releases).
+
+## Scanning
+
+By default KumuluzEE OpenAPI MP uses optimized scanning in order to reduce startup times. This means that only the main
+application JAR will be scanned (main artifact). In order to scan additional artifacts you need to specify them using
+the [scan-libraries mechanism](https://github.com/kumuluz/kumuluzee/pull/123). You need to include all dependencies
+which contain JAX-RS application and resources as well as dependencies containing models returned from JAX-RS resources.
+If all your models and resources are in the main artifact you don't need to include anything. For example to include
+_my-models_ artifact use the following configuration:
+
+```yaml
+kumuluzee:
+  dev:
+    scan-libraries:
+      - my-models
+```
+
+If you are unsure if your configuration is correct you can try to disable optimized scanning by using the following
+configuration:
+
+```yaml
+kumuluzee:
+  openapi-mp:
+    scanning:
+      optimize: false
+```
+
+You can also enable scan debugging by setting the following key to `true`: `kumuluzee.openapi-mp.scanning.debug`. This
+will output a verbose log of scanning configuration and progress.
+
+## Adding Swagger UI
+
+To serve API specification in visual form and to allow API consumers to interact with API resources you can add
+Swagger UI by including the __kumuluzee-swagger-ui__ dependency:
+
+```xml
+<dependency>
+    <groupId>com.kumuluz.ee.openapi</groupId>
+    <artifactId>kumuluzee-openapi-mp-ui</artifactId>
+    <version>${kumuluzee-openapi-mp.version}</version>
+</dependency>
+```
+
+Swagger UI is automatically enabled and is available at __/api-specs/ui__. In order to disable Swagger UI you can set
+the configuration key `kumuluzee.openapi-mp.ui.enabled` to `false`. You can also remap the Swagger UI to another
+location by setting the `kumuluzee.openapi-mp.ui.mapping` key (default value: `/api-specs/ui`).
+
+Swagger UI needs to know where the OpenAPI specification is served from. It tries to define it from the following
+sources:
+
+1. Static: `<protocol>://localhost:<port>` (useful when nothing is defined, lowest priority)
+1. From the `servers` parameter in `@OpenAPIDefinition` annotation (useful when OpenAPI specification is available from
+   the same hostname as Swagger UI)
+1. Configuration property: `kumuluzee.server.base-url` (useful for overriding above values)
+1. Configuration property: `kumuluzee.openapi-mp.ui.specification-server` (same as above but in a namespace specific to
+   this extension)
 
 ## Changelog
 

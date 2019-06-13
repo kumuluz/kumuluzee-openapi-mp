@@ -78,7 +78,7 @@ public class OpenApiMpUiExtension implements Extension {
             //  1. <protocol>://localhost:<port> (lowest priority)
             //  2. servers parameter in @OpenAPIDefinition annotation (on application class)
             //  3. configuration property: kumuluzee.server.base-url
-            //  4. configuration property: kumuluzee.openapi-mp.spec-server (highest priority)
+            //  4. configuration property: kumuluzee.openapi-mp.ui.specification-server (highest priority)
 
             // 1.
             Integer port;
@@ -110,7 +110,8 @@ public class OpenApiMpUiExtension implements Extension {
             }
 
             // 4.
-            String fromConfig2 = configurationUtil.get("kumuluzee.openapi-mp.spec-server").orElse(null);
+            String fromConfig2 = configurationUtil.get("kumuluzee.openapi-mp.ui.specification-server")
+                    .orElse(null);
             if (fromConfig2 != null && !fromConfig2.isEmpty()) {
                 serverUrl = fromConfig2;
             }

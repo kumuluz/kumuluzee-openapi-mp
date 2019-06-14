@@ -31,7 +31,10 @@ import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.jetty.JettyServletServer;
 import com.kumuluz.ee.openapi.mp.utils.JarUtils;
-import io.github.classgraph.*;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfo;
+import io.github.classgraph.ClassInfoList;
+import io.github.classgraph.ScanResult;
 import io.smallrye.openapi.api.OpenApiConfig;
 import io.smallrye.openapi.api.OpenApiConfigImpl;
 import io.smallrye.openapi.api.OpenApiDocument;
@@ -78,11 +81,11 @@ public class OpenApiMpExtension implements Extension {
 
         InputStream stream = classLoader.getResourceAsStream("META-INF/openapi.yaml");
 
-        if(stream == null) {
+        if (stream == null) {
             stream = classLoader.getResourceAsStream("META-INF/openapi.yml");
         }
 
-        if(stream == null) {
+        if (stream == null) {
             stream = classLoader.getResourceAsStream("META-INF/openapi.json");
             staticFile.setFormat(OpenApiSerializer.Format.JSON);
         }
@@ -151,19 +154,19 @@ public class OpenApiMpExtension implements Extension {
         }
 
         // include/exclude according to configuration defined in MP spec
-        for(String c: config.scanClasses()) {
+        for (String c : config.scanClasses()) {
             LOG.info("Including class: " + c);
             classGraph.whitelistClasses(c);
         }
-        for(String p: config.scanPackages()) {
+        for (String p : config.scanPackages()) {
             LOG.info("Including package: " + p);
             classGraph.whitelistPackages(p);
         }
-        for(String c: config.scanExcludeClasses()) {
+        for (String c : config.scanExcludeClasses()) {
             LOG.info("Excluding class: " + c);
             classGraph.blacklistClasses(c);
         }
-        for(String p: config.scanExcludePackages()) {
+        for (String p : config.scanExcludePackages()) {
             LOG.info("Excluding package: " + p);
             classGraph.blacklistPackages(p);
         }
@@ -173,7 +176,7 @@ public class OpenApiMpExtension implements Extension {
         Indexer indexer = new Indexer();
         ClassLoader classLoader = getClass().getClassLoader();
 
-        for(ClassInfo classInfo: classInfoList) {
+        for (ClassInfo classInfo : classInfoList) {
             try {
                 indexer.index(classLoader.getResourceAsStream(classInfo.getName().replaceAll("\\.", "/") + ".class"));
             } catch (IOException e) {
@@ -194,7 +197,7 @@ public class OpenApiMpExtension implements Extension {
         openApiDocument.config(config);
         openApiDocument.modelFromReader(OpenApiProcessor.modelFromReader(config, classLoader));
         openApiDocument.modelFromStaticFile(OpenApiProcessor.modelFromStaticFile(getStaticFiles()));
-        if(!config.scanDisable()) {
+        if (!config.scanDisable()) {
             openApiDocument.modelFromAnnotations(OpenApiProcessor.modelFromAnnotations(config, getIndex(config)));
         }
         openApiDocument.filter(OpenApiProcessor.getFilter(config, classLoader));

@@ -40,9 +40,9 @@ public class OpenApiMPServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         PrintWriter writer = resp.getWriter();
-        if(OpenApiDocument.INSTANCE.isSet()) {
+        if (OpenApiDocument.INSTANCE.isSet()) {
             OpenApiSerializer.Format format = OpenApiSerializer.Format.YAML;
-            if(req.getParameter("format") != null && req.getParameter("format").equalsIgnoreCase("json")) {
+            if (req.getParameter("format") != null && req.getParameter("format").equalsIgnoreCase("json")) {
                 format = OpenApiSerializer.Format.JSON;
             }
             resp.setStatus(HttpServletResponse.SC_OK);

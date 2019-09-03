@@ -27,6 +27,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -41,10 +42,24 @@ public class OpenApiMPServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         PrintWriter writer = resp.getWriter();
         if (OpenApiDocument.INSTANCE.isSet()) {
+
+            // by default use yaml
             OpenApiSerializer.Format format = OpenApiSerializer.Format.YAML;
-            if (req.getParameter("format") != null && req.getParameter("format").equalsIgnoreCase("json")) {
+
+            // respect Accept header
+            if (req.getHeader("Accept").equals(MediaType.APPLICATION_JSON)) {
                 format = OpenApiSerializer.Format.JSON;
             }
+
+            // format query parameter can override format
+            if (req.getParameter("format") != null) {
+                if (req.getParameter("format").equalsIgnoreCase("json")) {
+                    format = OpenApiSerializer.Format.JSON;
+                } else {
+                    format = OpenApiSerializer.Format.YAML;
+                }
+            }
+
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType(format.getMimeType());
             String output = OpenApiSerializer.serialize(OpenApiDocument.INSTANCE.get(), format);

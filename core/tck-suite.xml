@@ -2,7 +2,11 @@
 <suite name="microprofile-openapi-tck" verbose="1" configfailurepolicy="continue">
     <test name="microprofile-openapi 1.0.0 TCK">
         <packages>
+            <!-- TCK -->
             <package name="org.eclipse.microprofile.openapi.tck.*"/>
+
+            <!-- internal -->
+            <package name="com.kumuluz.ee.openapi.tests"/>
         </packages>
     </test>
 </suite>

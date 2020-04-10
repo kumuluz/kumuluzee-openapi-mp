@@ -94,8 +94,11 @@ public class OpenApiMpUiExtension implements Extension {
 
             // 2.
             try {
-                URL url = new URL(OpenApiDocument.INSTANCE.get().getServers().get(0).getUrl());
-                serverUrl = url.getProtocol() + "://" + url.getHost() + ":" + url.getPort();
+                if (OpenApiDocument.INSTANCE.get().getServers()!=null
+                        && !OpenApiDocument.INSTANCE.get().getServers().isEmpty()) {
+                    URL url = new URL(OpenApiDocument.INSTANCE.get().getServers().get(0).getUrl());
+                    serverUrl = url.getProtocol() + "://" + url.getHost() + ":" + url.getPort();
+                }
             } catch (MalformedURLException e) {
                 LOG.warning("Server URL invalid: " + e.getMessage());
             } catch (IndexOutOfBoundsException e) {

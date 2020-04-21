@@ -53,7 +53,7 @@ public class SwaggerUIFilter implements Filter {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
 
-        String path = httpServletRequest.getServletPath();
+        String path = httpServletRequest.getContextPath()+httpServletRequest.getServletPath();
 
         // check if request is for UI
         if (path.contains(uiPath)) {

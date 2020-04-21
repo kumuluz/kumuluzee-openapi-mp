@@ -74,7 +74,7 @@ java -jar target/${project.build.finalName}.jar
 
 After startup API specification will be available at:
 
-**http://<-hostname->:<-port->/openapi**
+**http://<-hostname->:<-port->/<-optional-context-path->/openapi**
 
 Example:
 
@@ -102,7 +102,7 @@ kumuluzee:
 Some interesting configuration properties are:
 
 - `kumuluzee.openapi-mp.enabled` - If set to `false` disables the extension (and OpenAPI servlet). Default value: `true`
-- `kumuluzee.openapi-mp.servlet.mapping` - The endpoint at which the OpenAPI specification is available. Default value: `/openapi`
+- `kumuluzee.openapi-mp.servlet.mapping` - The endpoint at which the OpenAPI specification is available. Appended to optional server context path. Default value: `/openapi`
 - `kumuluzee.openapi-mp.scan.packages` - Comma separated list of packages which are scanned for the OpenAPI annotations.
   By default, all packages are scanned.
 
@@ -153,7 +153,7 @@ Swagger UI by including the __kumuluzee-swagger-ui__ dependency:
 
 Swagger UI is automatically enabled and is available at __/api-specs/ui__. In order to disable Swagger UI you can set
 the configuration key `kumuluzee.openapi-mp.ui.enabled` to `false`. You can also remap the Swagger UI to another
-location by setting the `kumuluzee.openapi-mp.ui.mapping` key (default value: `/api-specs/ui`).
+location by setting the `kumuluzee.openapi-mp.ui.mapping` key (default value: `/api-specs/ui`). Path is appended to optional server context path.
 
 Swagger UI needs to know where the OpenAPI specification is served from. It tries to define it from the following
 sources:

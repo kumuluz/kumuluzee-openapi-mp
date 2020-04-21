@@ -94,8 +94,11 @@ public class OpenApiMpUiExtension implements Extension {
 
             // 2.
             try {
-                URL url = new URL(OpenApiDocument.INSTANCE.get().getServers().get(0).getUrl());
-                serverUrl = url.getProtocol() + "://" + url.getHost() + ":" + url.getPort();
+                if (OpenApiDocument.INSTANCE.get().getServers()!=null
+                        && !OpenApiDocument.INSTANCE.get().getServers().isEmpty()) {
+                    URL url = new URL(OpenApiDocument.INSTANCE.get().getServers().get(0).getUrl());
+                    serverUrl = url.getProtocol() + "://" + url.getHost() + ":" + url.getPort();
+                }
             } catch (MalformedURLException e) {
                 LOG.warning("Server URL invalid: " + e.getMessage());
             } catch (IndexOutOfBoundsException e) {
@@ -124,18 +127,34 @@ public class OpenApiMpUiExtension implements Extension {
             // static files for Swagger UI, created by Maven download plugin and Maven copy plugin
             URL webApp = ResourceUtils.class.getClassLoader().getResource("swagger-ui/api-specs/ui");
 
+            // context path
+            String contextPath = configurationUtil.get("kumuluzee.server.context-path").orElse("");
+            if (contextPath.endsWith("/")) {
+                contextPath = contextPath.substring(0, contextPath.length() - 1);
+            }
+
             if (webApp != null) {
+
+                LOG.info("Swagger UI servlet registered on "+uiPath+ " (servlet context is implied)");
+                LOG.info("Swagger UI can be accessed at "+serverUrl + contextPath + uiPath);
+
                 // create servlet that will serve static files
                 Map<String, String> swaggerUiParams = new HashMap<>();
                 swaggerUiParams.put("resourceBase", webApp.toString());
-                swaggerUiParams.put("uiPath", uiPath);
+                swaggerUiParams.put("uiPath", uiPath); //context already included in servlet resolution
                 server.registerServlet(UiServlet.class, uiPath + "/*", swaggerUiParams, 1);
+
+                String specUrl = serverUrl + contextPath + specPath;
+                String oauth2RedirectUrl = serverUrl + contextPath + uiPath;
+                String redirUiPath = contextPath+uiPath;
+
+                LOG.info("Swagger UI spec URL resolved to "+specUrl);
 
                 // create filter that will redirect to Swagger UI with appropriate parameters
                 Map<String, String> swaggerUiFilterParams = new HashMap<>();
-                swaggerUiFilterParams.put("specUrl", serverUrl + specPath);
-                swaggerUiFilterParams.put("uiPath", uiPath);
-                swaggerUiFilterParams.put("oauth2RedirectUrl", serverUrl + uiPath + "/oauth2-redirect.html");
+                swaggerUiFilterParams.put("specUrl", specUrl);
+                swaggerUiFilterParams.put("uiPath", redirUiPath);
+                swaggerUiFilterParams.put("oauth2RedirectUrl", oauth2RedirectUrl + "/oauth2-redirect.html");
                 server.registerFilter(SwaggerUIFilter.class, uiPath + "/*", swaggerUiFilterParams);
 
             } else {

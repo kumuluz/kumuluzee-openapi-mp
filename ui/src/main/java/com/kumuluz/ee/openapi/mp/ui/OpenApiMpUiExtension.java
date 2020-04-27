@@ -37,6 +37,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import static com.kumuluz.ee.openapi.mp.ui.util.PathUtils.removeTrailingAndAddLeadingSlash;
+import static com.kumuluz.ee.openapi.mp.ui.util.PathUtils.removeTrailingSlashes;
+
 /**
  * OpenAPI MP UI extension. Serves UI on a configured mapping with appropriate parameters.
  *
@@ -48,6 +51,8 @@ import java.util.logging.Logger;
 public class OpenApiMpUiExtension implements Extension {
 
     private static final Logger LOG = Logger.getLogger(OpenApiMpUiExtension.class.getName());
+
+    public static final String OAUTH_HTML_PAGE = "/oauth2-redirect.html";
 
     @Override
     public void init(KumuluzServerWrapper kumuluzServerWrapper, EeConfig eeConfig) {
@@ -64,9 +69,8 @@ public class OpenApiMpUiExtension implements Extension {
             if (uiPath.endsWith("*")) {
                 uiPath = uiPath.substring(0, uiPath.length() - 1);
             }
-            if (uiPath.endsWith("/")) {
-                uiPath = uiPath.substring(0, uiPath.length() - 1);
-            }
+            uiPath = removeTrailingAndAddLeadingSlash(uiPath);
+            specPath = removeTrailingAndAddLeadingSlash(specPath);
 
             if (uiPath.isEmpty()) {
                 // not supported as of yet, probably could be done by very strict redirects in SwaggerUIFilter
@@ -120,9 +124,7 @@ public class OpenApiMpUiExtension implements Extension {
             }
 
             // remove trailing slashes
-            while (serverUrl.endsWith("/")) {
-                serverUrl = serverUrl.substring(0, serverUrl.length() - 1);
-            }
+            serverUrl = removeTrailingSlashes(serverUrl);
 
             // static files for Swagger UI, created by Maven download plugin and Maven copy plugin
             URL webApp = ResourceUtils.class.getClassLoader().getResource("swagger-ui/api-specs/ui");
@@ -153,8 +155,9 @@ public class OpenApiMpUiExtension implements Extension {
                 // create filter that will redirect to Swagger UI with appropriate parameters
                 Map<String, String> swaggerUiFilterParams = new HashMap<>();
                 swaggerUiFilterParams.put("specUrl", specUrl);
+                swaggerUiFilterParams.put("specPath", specPath);
                 swaggerUiFilterParams.put("uiPath", redirUiPath);
-                swaggerUiFilterParams.put("oauth2RedirectUrl", oauth2RedirectUrl + "/oauth2-redirect.html");
+                swaggerUiFilterParams.put("oauth2RedirectUrl", oauth2RedirectUrl + OAUTH_HTML_PAGE);
                 server.registerFilter(SwaggerUIFilter.class, uiPath + "/*", swaggerUiFilterParams);
 
             } else {

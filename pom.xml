@@ -37,8 +37,10 @@
         <smallrye-open-api.version>1.2.1</smallrye-open-api.version>
         <classgraph.version>4.8.39</classgraph.version>
         <swagger-ui.version>3.25.1</swagger-ui.version>
+        <rapidoc.version>8.0.0</rapidoc.version>
 
         <testng.version>6.9.9</testng.version>
+        <commons.io.version>2.6</commons.io.version>
 
         <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
         <nexus.staging.plugin.version>1.6.8</nexus.staging.plugin.version>
@@ -125,6 +127,11 @@
                 <artifactId>testng</artifactId>
                 <version>${testng.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons.io.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

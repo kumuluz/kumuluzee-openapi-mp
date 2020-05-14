@@ -28,7 +28,8 @@ import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.jetty.JettyServletServer;
 import com.kumuluz.ee.openapi.mp.ui.filters.SwaggerUIFilter;
-import com.kumuluz.ee.openapi.mp.ui.servlets.UiServlet;
+import com.kumuluz.ee.openapi.mp.ui.servlets.RapiDocServlet;
+import com.kumuluz.ee.openapi.mp.ui.servlets.SwaggerUiServlet;
 import io.smallrye.openapi.api.OpenApiDocument;
 
 import java.net.MalformedURLException;
@@ -48,6 +49,9 @@ import java.util.logging.Logger;
 public class OpenApiMpUiExtension implements Extension {
 
     private static final Logger LOG = Logger.getLogger(OpenApiMpUiExtension.class.getName());
+
+    private static final String IMPL_SWAGGER_UI = "swaggerui";
+    private static final String IMPL_RAPIDOC = "rapidoc";
 
     @Override
     public void init(KumuluzServerWrapper kumuluzServerWrapper, EeConfig eeConfig) {
@@ -124,41 +128,49 @@ public class OpenApiMpUiExtension implements Extension {
                 serverUrl = serverUrl.substring(0, serverUrl.length() - 1);
             }
 
-            // static files for Swagger UI, created by Maven download plugin and Maven copy plugin
-            URL webApp = ResourceUtils.class.getClassLoader().getResource("swagger-ui/api-specs/ui");
-
             // context path
             String contextPath = configurationUtil.get("kumuluzee.server.context-path").orElse("");
             if (contextPath.endsWith("/")) {
                 contextPath = contextPath.substring(0, contextPath.length() - 1);
             }
 
-            if (webApp != null) {
+            String implementation = configurationUtil.get("kumuluzee.openapi-mp.ui.implementation").orElse(IMPL_SWAGGER_UI);
 
-                LOG.info("Swagger UI servlet registered on "+uiPath+ " (servlet context is implied)");
-                LOG.info("Swagger UI can be accessed at "+serverUrl + contextPath + uiPath);
+            LOG.info("OpenApi UI ("+implementation+") servlet registered on " + uiPath + " (servlet context is implied)");
+            LOG.info("OpenApi UI ("+implementation+") can be accessed at " + serverUrl + contextPath + uiPath);
 
-                // create servlet that will serve static files
+            String specUrl = serverUrl + contextPath + specPath;
+            String oauth2RedirectUrl = serverUrl + contextPath + uiPath;
+            String redirUiPath = contextPath + uiPath;
+
+            LOG.info("OpenApi UI spec URL resolved to " + specUrl);
+
+            if (IMPL_SWAGGER_UI.equals(implementation)) {
+                // static files for Swagger UI, created by Maven download plugin and Maven copy plugin
+                URL swaggerUiWebApp = ResourceUtils.class.getClassLoader().getResource("swagger-ui/api-specs/ui");
+
+                if (swaggerUiWebApp != null) {
+                    // create servlet that will serve static files
+                    Map<String, String> swaggerUiParams = new HashMap<>();
+                    swaggerUiParams.put("resourceBase", swaggerUiWebApp.toString());
+                    swaggerUiParams.put("uiPath", uiPath); //context already included in servlet resolution
+                    server.registerServlet(SwaggerUiServlet.class, uiPath + "/*", swaggerUiParams, 1);
+
+                    // create filter that will redirect to Swagger UI with appropriate parameters
+                    Map<String, String> swaggerUiFilterParams = new HashMap<>();
+                    swaggerUiFilterParams.put("specUrl", specUrl);
+                    swaggerUiFilterParams.put("uiPath", redirUiPath);
+                    swaggerUiFilterParams.put("oauth2RedirectUrl", oauth2RedirectUrl + "/oauth2-redirect.html");
+                    server.registerFilter(SwaggerUIFilter.class, uiPath + "/*", swaggerUiFilterParams);
+
+                } else {
+                    LOG.severe("Swagger UI not found. Try cleaning and rebuilding project.");
+                }
+            }
+            else if (IMPL_RAPIDOC.equals(implementation)) {
                 Map<String, String> swaggerUiParams = new HashMap<>();
-                swaggerUiParams.put("resourceBase", webApp.toString());
-                swaggerUiParams.put("uiPath", uiPath); //context already included in servlet resolution
-                server.registerServlet(UiServlet.class, uiPath + "/*", swaggerUiParams, 1);
-
-                String specUrl = serverUrl + contextPath + specPath;
-                String oauth2RedirectUrl = serverUrl + contextPath + uiPath;
-                String redirUiPath = contextPath+uiPath;
-
-                LOG.info("Swagger UI spec URL resolved to "+specUrl);
-
-                // create filter that will redirect to Swagger UI with appropriate parameters
-                Map<String, String> swaggerUiFilterParams = new HashMap<>();
-                swaggerUiFilterParams.put("specUrl", specUrl);
-                swaggerUiFilterParams.put("uiPath", redirUiPath);
-                swaggerUiFilterParams.put("oauth2RedirectUrl", oauth2RedirectUrl + "/oauth2-redirect.html");
-                server.registerFilter(SwaggerUIFilter.class, uiPath + "/*", swaggerUiFilterParams);
-
-            } else {
-                LOG.severe("Swagger UI not found. Try cleaning and rebuilding project.");
+                swaggerUiParams.put("specUrl", specUrl);
+                server.registerServlet(RapiDocServlet.class, uiPath + "/*", swaggerUiParams, 1);
             }
         } else {
             LOG.severe("KumuluzEE not started with " + JettyServletServer.class.getSimpleName() +

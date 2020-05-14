@@ -33,9 +33,9 @@ import javax.servlet.UnavailableException;
  * @author Urban Malc
  * @since 1.1.0
  */
-public class UiServlet extends DefaultServlet {
+public class SwaggerUiServlet extends DefaultServlet {
 
-    private static final Logger LOG = Log.getLogger(UiServlet.class);
+    private static final Logger LOG = Log.getLogger(SwaggerUiServlet.class);
 
     private String uiPath;
 

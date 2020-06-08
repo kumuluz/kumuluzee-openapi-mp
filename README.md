@@ -167,7 +167,7 @@ sources:
    
 ## Alternative UI implementations
 
-You can also replace SwaggerUI with a different UI implementation. Currently supported alternatives are: [https://mrin9.github.io/RapiDoc/](RapiDoc).
+You can also replace SwaggerUI with a different UI implementation. Currently supported alternatives are: [RapiDoc](https://mrin9.github.io/RapiDoc/).
    
 ### Configuring RapiDoc
 
@@ -183,7 +183,7 @@ openapi-mp:
 ```
 Supported values are: `swaggerui`, `rapidoc`.
 
-Under `extensions.rapidoc` key you can specify any supported configuration key by [https://mrin9.github.io/RapiDoc/api.html](RapiDoc API). The specified key-value pairs will be dynamically appended to the `<rapi-doc>` HTML tag. Configuration options which are outside the tag (like slots) are not supported at the moment.
+Under `extensions.rapidoc` key you can specify any supported configuration key by [RapiDoc API](https://mrin9.github.io/RapiDoc/api.html). The specified key-value pairs will be dynamically appended to the `<rapi-doc>` HTML tag. Configuration options which are outside the tag (like slots) are not supported at the moment.
 
 ## Changelog
 

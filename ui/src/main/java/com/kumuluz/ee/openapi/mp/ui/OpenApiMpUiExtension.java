@@ -94,6 +94,7 @@ public class OpenApiMpUiExtension implements Extension {
                 port = eeConfig.getServer().getHttps().getPort();
                 serverUrl = "https://" + serverUrl;
             }
+
             serverUrl += (port != null ? ":" + port.toString() : "");
 
             // 2.

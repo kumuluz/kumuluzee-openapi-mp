@@ -72,10 +72,11 @@ public class RapiDocServlet extends HttpServlet {
             fullConfig.put("spec-url", specUrl);
 
             //Custom
-            Optional<List<String>> keys = ConfigurationUtil.getInstance().getMapKeys("kumuluzee.openapi-mp.extensions.rapidoc");
+            Optional<List<String>> keys = ConfigurationUtil.getInstance().getMapKeys("kumuluzee.openapi-mp.ui.extensions.rapidoc");
             if (keys.isPresent()) {
                 Map<String, String> customConfig = keys.get().stream().collect(Collectors.toMap(i -> i,
-                    j -> ConfigurationUtil.getInstance().get(j).get(), (oldValue, newValue) -> newValue));
+                    j -> ConfigurationUtil.getInstance()
+                        .get("kumuluzee.openapi-mp.ui.extensions.rapidoc."+j).get(), (oldValue, newValue) -> newValue));
                 fullConfig.putAll(customConfig);
             }
 
@@ -96,7 +97,6 @@ public class RapiDocServlet extends HttpServlet {
             index = index.replace("<rapi-doc>", builder.toString());
         }
 
-        System.out.print(index);
         out.print(index);
     }
 }

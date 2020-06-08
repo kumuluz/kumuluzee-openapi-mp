@@ -164,6 +164,26 @@ sources:
 1. Configuration property: `kumuluzee.server.base-url` (useful for overriding above values)
 1. Configuration property: `kumuluzee.openapi-mp.ui.specification-server` (same as above but in a namespace specific to
    this extension)
+   
+## Alternative UI implementations
+
+You can also replace SwaggerUI with a different UI implementation. Currently supported alternatives are: [https://mrin9.github.io/RapiDoc/](RapiDoc).
+   
+### Configuring RapiDoc
+
+You can change the implementation with the `implementation` config key:
+```
+openapi-mp:
+    ui:
+      enabled: true
+      implementation: rapidoc
+      extensions:
+        rapidoc:
+          show-header: true
+```
+Supported values are: `swaggerui`, `rapidoc`.
+
+Under `extensions.rapidoc` key you can specify any supported configuration key by [https://mrin9.github.io/RapiDoc/api.html](RapiDoc API). The specified key-value pairs will be dynamically appended to the `<rapi-doc>` HTML tag. Configuration options which are outside the tag (like slots) are not supported at the moment.
 
 ## Changelog
 

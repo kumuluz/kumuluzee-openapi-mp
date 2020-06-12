@@ -155,6 +155,21 @@ public class SwaggerUIFilterAutoConfigTest {
     }
 
     @Test
+    public void redirectingWhenServerListContainsLoopbackServerWithDifferentPort() throws Exception {
+        String testLocalhost = "http://localhost:8081";
+
+        doReturn(TRUE_OPTIONAL).when(configurationUtilMock).getBoolean(AUTO_CONFIG_SWITCH);
+        doReturn(new StringBuilder(testLocalhost)).when(servletRequestMock).getRootURL();
+
+        swaggerUIFilterSpy.init(filterConfigMock);
+        swaggerUIFilterSpy.doFilter(servletRequestMock, servletResponseMock, filterChainMock);
+
+        assertThat(redirectedUrl).isEqualTo(UI_PATH + URL_QUERY + testLocalhost + SPEC_PATH + URL_OA_QUERY +
+                testLocalhost + UI_PATH + OA_HTML);
+        assertThat(getStringServerList()).containsExactly(testLocalhost, API_SERVER_A, API_SERVER_B);
+    }
+
+    @Test
     public void redirectingWhenDynamicServerIsLoopbackServerAndIsNotInServerList() throws Exception {
         String localHost = "http://[::1]:8080";
         doReturn(TRUE_OPTIONAL).when(configurationUtilMock).getBoolean(AUTO_CONFIG_SWITCH);
@@ -190,7 +205,7 @@ public class SwaggerUIFilterAutoConfigTest {
     }
 
     @Test
-    public void redirectingWithPresentXPathWhichIsDisbledInConfig() throws Exception {
+    public void redirectingWithPresentXPathWhichIsDisabledInConfig() throws Exception {
         doReturn(TRUE_OPTIONAL).when(configurationUtilMock).getBoolean(AUTO_CONFIG_SWITCH);
         doReturn(FALSE_OPTIONAL).when(configurationUtilMock).getBoolean(ORIGINAL_URI_CHECK_SWITCH);
         doReturn(XPATH).when(servletRequestMock).getHeader(X_ORIGINAL_URI);
@@ -204,28 +219,14 @@ public class SwaggerUIFilterAutoConfigTest {
     }
 
     @Test
-    public void dynamicServerIsAlreadyInListTest() throws Exception {
+    public void dynamicServerIsAlreadyInListOnBottom() throws Exception {
         doReturn(TRUE_OPTIONAL).when(configurationUtilMock).getBoolean(AUTO_CONFIG_SWITCH);
         serverList.add(new CustomServer(HTTP_SERVER));
 
         swaggerUIFilterSpy.init(filterConfigMock);
         swaggerUIFilterSpy.doFilter(servletRequestMock, servletResponseMock, filterChainMock);
 
-        assertThat(getStringServerList()).containsExactly(API_SERVER_A, API_SERVER_B, HTTP_SERVER);
-    }
-
-    @Test
-    public void dynamicRedirectingWithDisabledUpdateOfServerList() throws Exception {
-        doReturn(TRUE_OPTIONAL).when(configurationUtilMock).getBoolean(AUTO_CONFIG_SWITCH);
-        doReturn(FALSE_OPTIONAL).when(configurationUtilMock).getBoolean(UPDATE_SERVERS_SWITCH);
-
-        swaggerUIFilterSpy.init(filterConfigMock);
-        swaggerUIFilterSpy.doFilter(servletRequestMock, servletResponseMock, filterChainMock);
-
-        assertThat(redirectedUrl)
-                .isEqualTo(UI_PATH + URL_QUERY + HTTP_SERVER + SPEC_PATH + URL_OA_QUERY + HTTP_SERVER + UI_PATH + OA_HTML);
-
-        assertThat(getStringServerList()).containsExactly(API_SERVER_A, API_SERVER_B);
+        assertThat(getStringServerList()).containsExactly(HTTP_SERVER, API_SERVER_A, API_SERVER_B);
     }
 
     // mocks setup
@@ -245,7 +246,6 @@ public class SwaggerUIFilterAutoConfigTest {
 
     private void setupConfigMocks() {
         doReturn(DEFAULT_VALUE_OPTIONAL).when(configurationUtilMock).getBoolean(AUTO_CONFIG_SWITCH);
-        doReturn(DEFAULT_VALUE_OPTIONAL).when(configurationUtilMock).getBoolean(UPDATE_SERVERS_SWITCH);
         doReturn(DEFAULT_VALUE_OPTIONAL).when(configurationUtilMock).getBoolean(ORIGINAL_URI_CHECK_SWITCH);
 
         doReturn(UI_PATH).when(filterConfigMock).getInitParameter(UI_PATH_PARAMETER);

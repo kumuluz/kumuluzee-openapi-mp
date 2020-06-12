@@ -25,6 +25,7 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.eclipse.microprofile.openapi.models.servers.Server;
 
+import javax.annotation.Nullable;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -72,7 +73,6 @@ public class SwaggerUIFilter implements Filter {
     private String oauth2RedirectUrl;
     private String specPath;
     private boolean isAutoConfigure;
-    private boolean isServerListUpdateEnabled;
     private boolean isXURICheckEnabled;
 
     @Override
@@ -125,10 +125,7 @@ public class SwaggerUIFilter implements Filter {
             String rootPath = getRootPath(request);
             URI rootURI = URI.create(getRootUrl(request) + rootPath);
 
-            // update server list if enabled
-            if (isServerListUpdateEnabled) {
-                updateServerList(rootURI);
-            }
+            updateServerList(rootURI);
 
             String rootUrl = rootURI.toString();
             return rootPath + uiPath + URL_QUERY + rootUrl + specPath + OAUTH_QUERY + rootUrl + uiPath + OAUTH_HTML_PAGE;
@@ -160,7 +157,7 @@ public class SwaggerUIFilter implements Filter {
 
     /**
      * Updates Open API servers list.
-     * If URL is already in list or it is loopback address then no action is taken.
+     * If URL is already in list its moved to top if not already.
      */
     private synchronized void updateServerList(URI rootURI) {
         OpenAPI openApiDocument = getOpenAPI();
@@ -168,24 +165,54 @@ public class SwaggerUIFilter implements Filter {
         List<Server> oldServers =
                 Optional.ofNullable(openApiDocument.getServers()).orElse(Collections.emptyList());
 
-        // update server list and in case where server was add also move it to the top
-        if (isNotInServerList(rootURI, oldServers)) {
-            // note: there is possibility that simultaneous getting of openapi .json and invoking
-            // ui endpoint will result in 2 different lists of servers
-            ArrayList<Server> newServers = new ArrayList<>();
-            newServers.add(new CustomServer(rootURI.toString()));
-            newServers.addAll(oldServers);
-            openApiDocument.setServers(newServers);
+        List<Server> updatedServerList = findServerForUri(rootURI, oldServers)
+                .map(foundServer -> moveServerOnTopOfServerList(foundServer, oldServers))
+                .orElseGet(() -> addUriAsServerOnTopOfServerList(rootURI, oldServers));
+
+        openApiDocument.setServers(updatedServerList);
+    }
+
+    private List<Server> moveServerOnTopOfServerList(Server server, List<Server> serverList) {
+        if (server.equals(serverList.get(0))) {
+            return serverList;
+        }
+
+        ArrayList<Server> newServers = new ArrayList<>(serverList.size());
+        newServers.addAll(serverList);
+        newServers.remove(server);
+        newServers.add(0, server);
+        return newServers;
+    }
+
+    private List<Server> addUriAsServerOnTopOfServerList(URI serverUri, List<Server> serverList) {
+        ArrayList<Server> newServers = new ArrayList<>(serverList.size() + 1);
+        newServers.add(new CustomServer(serverUri.toString()));
+        newServers.addAll(serverList);
+        return newServers;
+    }
+
+    private Optional<Server> findServerForUri(URI rootURI, List<Server> oldServers) {
+        return oldServers
+                .stream()
+                .filter(s -> {
+                    URI serverUri = toUriIgnoringException(s.getUrl());
+                    // first check if servers are match, then compare if urls are loopback and if ports are same
+                    return rootURI.equals(serverUri) || areSameLoopbackAddresses(serverUri, rootURI);
+                })
+                .findFirst();
+    }
+
+    private @Nullable URI toUriIgnoringException(String uriString) {
+        try {
+            return URI.create(uriString);
+        } catch (NullPointerException | IllegalArgumentException e) {
+            LOG.warning("Failed to create URI from '" + uriString + "'!");
+            return null;
         }
     }
 
-    private boolean isNotInServerList(URI rootURI, List<Server> oldServers) {
-        boolean isRootUrlLoopback = isLoopbackHost(rootURI.getHost());
-        return oldServers
-                .stream()
-                // first check if servers are match,then compare if urls are loopback and are matched
-                .noneMatch(s -> rootURI.toString().equalsIgnoreCase(s.getUrl()) ||
-                            isRootUrlLoopback && isLoopbackUrl(s.getUrl()));
+    private boolean areSameLoopbackAddresses(@Nullable URI serverUri, URI rootUri) {
+        return isLoopbackUri(serverUri) && isLoopbackUri(rootUri) && serverUri.getPort() == rootUri.getPort();
     }
 
     private void getServerAutoConfigurationSettings() {
@@ -194,40 +221,21 @@ public class SwaggerUIFilter implements Filter {
         this.isAutoConfigure = configurationUtil
                 .getBoolean("kumuluzee.openapi-mp.ui.server-auto-config.enabled")
                 .orElse(false);
-        this.isServerListUpdateEnabled = configurationUtil
-                .getBoolean("kumuluzee.openapi-mp.ui.server-auto-config.update-servers")
-                .orElse(true);
         this.isXURICheckEnabled = configurationUtil
                 .getBoolean("kumuluzee.openapi-mp.ui.server-auto-config.original-uri-check")
                 .orElse(false);
     }
 
     /**
-     * Determines if supplied host is loopback address or not.
+     * Determines if supplied uri is loopback address or not.
      */
-    public static boolean isLoopbackHost(String host) {
-        if (host == null || host.isEmpty()) {
+    public static boolean isLoopbackUri(URI uri) {
+        if (uri == null || uri.getHost() == null) {
             return false;
         }
 
-        String lowerCaseHost = host.toLowerCase();
+        String lowerCaseHost = uri.getHost().toLowerCase();
         return LOCAL_HOST_ALIASES.stream().anyMatch(lowerCaseHost::startsWith);
-    }
-
-    /**
-     * Determines if supplied host is loopback address or not.
-     */
-    public static boolean isLoopbackUrl(String uri) {
-        if (uri == null || uri.isEmpty()) {
-            return false;
-        }
-
-        try {
-            return isLoopbackHost(URI.create(uri).getHost());
-        } catch (SecurityException | IllegalArgumentException e) {
-            // exception is not important, its just hint to return false so logging is omitted
-            return false;
-        }
     }
 
     @VisibleForTesting

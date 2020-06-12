@@ -164,6 +164,32 @@ sources:
 1. Configuration property: `kumuluzee.server.base-url` (useful for overriding above values)
 1. Configuration property: `kumuluzee.openapi-mp.ui.specification-server` (same as above but in a namespace specific to
    this extension)
+   
+## Swagger UI server auto configuration
+
+Server auto configuration allows for dynamic resolution of parameters like `kumuluzee.openapi-mp.ui.specification-server` 
+instead of need to set it. This is done by retrieving necessary information from request during runtime and based on that 
+setting correct redirect. It is especially useful when service is being deployed in multiple environments.
+This feature also updates list of servers in Swagger UI and reorder them, so it will be first one.
+It is also possible to resolve correct redirect when service is behind for example Ingres (Ingress must have enabled feature which 
+forwards original URL).
+
+By default, this feature is disabled for backward compatibility. To enable it set `kumuluzee.openapi-mp.ui.auto-config.enabled`
+to `true`. To enable (Ingress) URI check set `kumuluzee.openapi-mp.ui.auto-config.original-uri-check` to `true`.
+
+Default settings for server auto configuration:
+```yaml
+kumuluzee:
+  openapi-mp:
+    ui:
+      server-auto-config:
+        enabled: false
+        original-uri-check: false
+```
+
+> **note:** localhost server with same port is added only once (if not already specified in @OpenAPIDefinition) and in case in which 
+> is used localhost address in different format (for example http://127.0.0.1:8080 instead of http://localhost:8080), 
+>no new server will be added to list and because of this Swagger UI will be unable to do API calls (this is due to issue with cors) 
 
 ## Changelog
 

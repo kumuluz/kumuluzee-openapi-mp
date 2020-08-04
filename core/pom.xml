@@ -5,7 +5,7 @@
     <parent>
         <artifactId>kumuluzee-openapi-mp-parent</artifactId>
         <groupId>com.kumuluz.ee.openapi</groupId>
-        <version>1.2.0</version>
+        <version>1.2.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 

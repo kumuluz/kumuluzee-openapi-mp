@@ -7,7 +7,7 @@
     <groupId>com.kumuluz.ee.openapi</groupId>
     <artifactId>kumuluzee-openapi-mp-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
     <modules>
         <module>core</module>
         <module>ui</module>

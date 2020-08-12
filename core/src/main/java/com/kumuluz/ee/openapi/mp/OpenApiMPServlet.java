@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Servlet for serving the OpenAPI file.
@@ -38,8 +39,11 @@ import java.io.PrintWriter;
  * @since 1.0.0
  */
 public class OpenApiMPServlet extends HttpServlet {
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
+
         PrintWriter writer = resp.getWriter();
         if (OpenApiDocument.INSTANCE.isSet()) {
 

@@ -110,9 +110,9 @@ public class OpenApiMpExtension implements Extension {
         }
 
         // disable Jersey wadl
-        classGraph.blacklistPackages("org.glassfish.jersey.server.wadl");
+        classGraph.rejectPackages("org.glassfish.jersey.server.wadl");
         // disable Jersey ResourceConfig
-        classGraph.blacklistClasses(ResourceConfig.class.getName());
+        classGraph.rejectClasses(ResourceConfig.class.getName());
 
         if (ConfigurationUtil.getInstance().getBoolean("kumuluzee.openapi-mp.scanning.optimize").orElse(true)) {
             List<String> scanJars = new LinkedList<>(); // which jars should ClassGraph scan
@@ -148,9 +148,9 @@ public class OpenApiMpExtension implements Extension {
                     // - artifact-1.0.0-SNAPSHOT.jar
                     // - artifact
                     if (scanJar.endsWith(".jar")) {
-                        classGraph.whitelistJars(scanJar);
+                        classGraph.acceptJars(scanJar);
                     } else {
-                        classGraph.whitelistJars(scanJar + "-*.jar");
+                        classGraph.acceptJars(scanJar + "-*.jar");
                     }
                 }
             }

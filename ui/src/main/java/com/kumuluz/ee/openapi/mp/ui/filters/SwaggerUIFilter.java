@@ -20,32 +20,22 @@
  */
 package com.kumuluz.ee.openapi.mp.ui.filters;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import io.smallrye.openapi.api.OpenApiDocument;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.eclipse.microprofile.openapi.models.servers.Server;
 
 import javax.annotation.Nullable;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 
 import static com.kumuluz.ee.openapi.mp.ui.OpenApiMpUiExtension.OAUTH_HTML_PAGE;
 import static com.kumuluz.ee.openapi.mp.ui.util.PathUtils.removeTrailingAndAddLeadingSlash;

@@ -40,7 +40,7 @@ import io.smallrye.openapi.api.OpenApiConfigImpl;
 import io.smallrye.openapi.api.OpenApiDocument;
 import io.smallrye.openapi.runtime.OpenApiProcessor;
 import io.smallrye.openapi.runtime.OpenApiStaticFile;
-import io.smallrye.openapi.runtime.io.OpenApiSerializer;
+import io.smallrye.openapi.runtime.io.Format;
 import org.eclipse.microprofile.config.ConfigProvider;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.jboss.jandex.Index;
@@ -48,9 +48,12 @@ import org.jboss.jandex.Indexer;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * MicroProfile OpenAPI extension.
@@ -77,7 +80,7 @@ public class OpenApiMpExtension implements Extension {
     private OpenApiStaticFile getStaticFiles() {
         OpenApiStaticFile staticFile = new OpenApiStaticFile();
         ClassLoader classLoader = getClass().getClassLoader();
-        staticFile.setFormat(OpenApiSerializer.Format.YAML);
+        staticFile.setFormat(Format.YAML);
 
         InputStream stream = classLoader.getResourceAsStream("META-INF/openapi.yaml");
 
@@ -87,7 +90,7 @@ public class OpenApiMpExtension implements Extension {
 
         if (stream == null) {
             stream = classLoader.getResourceAsStream("META-INF/openapi.json");
-            staticFile.setFormat(OpenApiSerializer.Format.JSON);
+            staticFile.setFormat(Format.JSON);
         }
 
         if (stream == null) {
@@ -154,22 +157,26 @@ public class OpenApiMpExtension implements Extension {
         }
 
         // include/exclude according to configuration defined in MP spec
-        for (String c : config.scanClasses()) {
+        for (String c : patternToStringArray(config.scanClasses())) {
             LOG.info("Including class: " + c);
-            classGraph.whitelistClasses(c);
+            classGraph.acceptClasses(c);
         }
-        for (String p : config.scanPackages()) {
+
+        for (String p : patternToStringArray(config.scanClasses())) {
             LOG.info("Including package: " + p);
-            classGraph.whitelistPackages(p);
+            classGraph.acceptPackages(p);
         }
-        for (String c : config.scanExcludeClasses()) {
+
+        for (String c : patternToStringArray(config.scanExcludeClasses())) {
             LOG.info("Excluding class: " + c);
-            classGraph.blacklistClasses(c);
+            classGraph.rejectClasses(c);
         }
-        for (String p : config.scanExcludePackages()) {
+
+        for (String p : patternToStringArray(config.scanExcludePackages())) {
             LOG.info("Excluding package: " + p);
-            classGraph.blacklistPackages(p);
+            classGraph.rejectPackages(p);
         }
+
         ScanResult scanResult = classGraph.scan();
 
         ClassInfoList classInfoList = scanResult.getAllClasses();
@@ -219,5 +226,20 @@ public class OpenApiMpExtension implements Extension {
         return config.getBoolean("mp.openapi.enabled")
                 .orElse(config.getBoolean("kumuluzee.openapi-mp.enabled")
                         .orElse(true));
+    }
+
+    private String[] patternToStringArray(Pattern pattern) {
+        if (pattern == null) {
+            return new String[] {};
+        }
+
+        return Arrays.stream(pattern.pattern().split("\\|"))
+                .map(s -> s.replaceAll("\\(", ""))
+                .map(s -> s.replaceAll("\\)", ""))
+                .map(s -> s.replaceAll("\\\\Q", ""))
+                .map(s -> s.replaceAll("\\\\E", ""))
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList())
+                .toArray(new String[] {});
     }
 }

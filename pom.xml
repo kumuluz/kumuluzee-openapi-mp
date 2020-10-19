@@ -11,6 +11,7 @@
     <modules>
         <module>core</module>
         <module>ui</module>
+        <module>tools</module>
     </modules>
 
     <name>KumuluzEE OpenAPI MicroProfile Parent</name>
@@ -29,14 +30,15 @@
 
         <jaxb-api.version>2.3.1</jaxb-api.version>
 
-        <kumuluzee.version>3.10.0</kumuluzee.version>
+        <kumuluzee.version>3.11.0</kumuluzee.version>
         <kumuluzee-config-mp.version>1.4.0</kumuluzee-config-mp.version>
         <kumuluzee-arquillian-container.version>1.1.0</kumuluzee-arquillian-container.version>
 
         <microprofile-openapi.version>1.1.2</microprofile-openapi.version>
-        <smallrye-open-api.version>1.2.4</smallrye-open-api.version>
-        <classgraph.version>4.8.39</classgraph.version>
-        <swagger-ui.version>3.30.0</swagger-ui.version>
+        <smallrye-open-api.version>2.0.12</smallrye-open-api.version>
+        <classgraph.version>4.8.90</classgraph.version>
+        <swagger-ui.version>3.35.2</swagger-ui.version>
+        <maven-project.version>2.2.1</maven-project.version>
 
         <testng.version>6.9.9</testng.version>
         <org.mockito.version>3.3.3</org.mockito.version>
@@ -100,22 +102,36 @@
                 <artifactId>kumuluzee-config-mp</artifactId>
                 <version>${kumuluzee-config-mp.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>io.smallrye</groupId>
-                <artifactId>smallrye-open-api</artifactId>
+                <artifactId>smallrye-open-api-core</artifactId>
                 <version>${smallrye-open-api.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>io.smallrye</groupId>
+                <artifactId>smallrye-open-api-jaxrs</artifactId>
+                <version>${smallrye-open-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.smallrye</groupId>
+                <artifactId>smallrye-open-api-maven-plugin</artifactId>
+                <version>${smallrye-open-api.version}</version>
+            </dependency>
             <dependency>
                 <groupId>io.github.classgraph</groupId>
                 <artifactId>classgraph</artifactId>
                 <version>${classgraph.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-project</artifactId>
+                <version>${maven-project.version}</version>
             </dependency>
 
             <dependency>

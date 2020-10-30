@@ -162,7 +162,7 @@ public class OpenApiMpExtension implements Extension {
             classGraph.acceptClasses(c);
         }
 
-        for (String p : patternToStringArray(config.scanClasses())) {
+        for (String p : patternToStringArray(config.scanPackages())) {
             LOG.info("Including package: " + p);
             classGraph.acceptPackages(p);
         }

@@ -35,10 +35,11 @@
         <kumuluzee-arquillian-container.version>1.1.0</kumuluzee-arquillian-container.version>
 
         <microprofile-openapi.version>1.1.2</microprofile-openapi.version>
-        <smallrye-open-api.version>2.0.12</smallrye-open-api.version>
+        <smallrye-open-api.version>2.0.13</smallrye-open-api.version>
         <classgraph.version>4.8.90</classgraph.version>
         <swagger-ui.version>3.35.2</swagger-ui.version>
         <maven-project.version>2.2.1</maven-project.version>
+        <mojo-executor.version>2.3.1</mojo-executor.version>
 
         <testng.version>6.9.9</testng.version>
         <org.mockito.version>3.3.3</org.mockito.version>
@@ -132,6 +133,11 @@
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-project</artifactId>
                 <version>${maven-project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.twdata.maven</groupId>
+                <artifactId>mojo-executor</artifactId>
+                <version>${mojo-executor.version}</version>
             </dependency>
 
             <dependency>

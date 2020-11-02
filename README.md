@@ -191,6 +191,35 @@ kumuluzee:
 > is used localhost address in different format (for example http://127.0.0.1:8080 instead of http://localhost:8080), 
 >no new server will be added to list and because of this Swagger UI will be unable to do API calls (this is due to issue with cors) 
 
+## OpenAPI Maven Plugin
+
+Maven plugin can be used to generate OpenAPI schema when building the application. To use it add the following to
+pom.xml:
+
+```
+<plugin>
+    <artifactId>kumuluzee-openapi-mp-maven-plugin</artifactId>
+    <groupId>com.kumuluz.ee.openapi</groupId>
+    <version>${kumuluzee-openapi-mp.version}</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>generate</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
+
+By default, the schema is generated in `target/generated/` directory in JSON and YAML formats.
+
+If the schema is defined across multiple artefacts you must define the `<scanLibraries></scanLibraries>` configuration
+property with comma-separated list of dependencies in the same format as described in the [Scanning](#scanning) section
+above.
+
+Maven plugin uses SmallRye implementation in order to generate the schema. For more configuration options see the
+following document: https://github.com/smallrye/smallrye-open-api/tree/master/tools/maven-plugin#configuration-options
+
 ## Changelog
 
 Recent changes can be viewed on Github on the [Releases Page](https://github.com/kumuluz/kumuluzee-openapi-mp/releases)

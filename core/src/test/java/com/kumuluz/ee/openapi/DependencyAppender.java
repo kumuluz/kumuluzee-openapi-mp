@@ -42,7 +42,9 @@ public class DependencyAppender implements MavenDependencyAppender {
         libs.add("com.kumuluz.ee:kumuluzee-jax-rs-jersey:");
         libs.add("com.kumuluz.ee.config:kumuluzee-config-mp:" +
                 versionsBundle.getString("kumuluzee-config-mp.version"));
-        libs.add("io.smallrye:smallrye-open-api:" +
+        libs.add("io.smallrye:smallrye-open-api-core:" +
+                versionsBundle.getString("smallrye-open-api.version"));
+        libs.add("io.smallrye:smallrye-open-api-jaxrs:" +
                 versionsBundle.getString("smallrye-open-api.version"));
         libs.add("io.github.classgraph:classgraph:" +
                 versionsBundle.getString("classgraph.version"));

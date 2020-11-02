@@ -21,6 +21,7 @@
 package com.kumuluz.ee.openapi.mp;
 
 import io.smallrye.openapi.api.OpenApiDocument;
+import io.smallrye.openapi.runtime.io.Format;
 import io.smallrye.openapi.runtime.io.OpenApiSerializer;
 
 import javax.servlet.ServletException;
@@ -48,19 +49,19 @@ public class OpenApiMPServlet extends HttpServlet {
         if (OpenApiDocument.INSTANCE.isSet()) {
 
             // by default use yaml
-            OpenApiSerializer.Format format = OpenApiSerializer.Format.YAML;
+            Format format = Format.YAML;
 
             // respect Accept header
             if (req.getHeader("Accept").equals(MediaType.APPLICATION_JSON)) {
-                format = OpenApiSerializer.Format.JSON;
+                format = Format.JSON;
             }
 
             // format query parameter can override format
             if (req.getParameter("format") != null) {
                 if (req.getParameter("format").equalsIgnoreCase("json")) {
-                    format = OpenApiSerializer.Format.JSON;
+                    format = Format.JSON;
                 } else {
-                    format = OpenApiSerializer.Format.YAML;
+                    format = Format.YAML;
                 }
             }
 

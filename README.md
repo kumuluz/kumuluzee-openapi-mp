@@ -196,7 +196,7 @@ kumuluzee:
 Maven plugin can be used to generate OpenAPI schema when building the application. To use it add the following to
 pom.xml:
 
-```
+```xml
 <plugin>
     <artifactId>kumuluzee-openapi-mp-maven-plugin</artifactId>
     <groupId>com.kumuluz.ee.openapi</groupId>

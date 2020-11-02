@@ -77,7 +77,6 @@ public class GenerateMojo extends GenerateSchemaMojo {
                 .map(p -> (Xpp3Dom) p.getConfiguration())
                 .orElse(new Xpp3Dom("configuration"));
 
-        Xpp3Dom scanClassesChild = configuration.getChild("scanClasses");
         String scanClassesValue;
         try {
             scanClassesValue = getScanClassesValue();
@@ -85,42 +84,12 @@ public class GenerateMojo extends GenerateSchemaMojo {
             throw new MojoExecutionException("Can't obtain all scan classes.");
         }
 
-        if (scanClassesChild != null) {
-            scanClassesChild.setValue(scanClassesValue);
-        } else {
-            scanClassesChild = new Xpp3Dom("scanClasses");
-            scanClassesChild.setValue(scanClassesValue);
-            configuration.addChild(scanClassesChild);
-        }
+        addChild(configuration, "scanClasses", scanClassesValue);
+        addChild(configuration, "scanExcludeClasses", "org.glassfish.jersey.server.ResourceConfig", true);
+        addChild(configuration, "scanExcludePackages", "org.glassfish.jersey.server.wadl", true);
 
-        Xpp3Dom excludeClassesChild = configuration.getChild("scanExcludeClasses");
-        if (excludeClassesChild != null) {
-            String excludeClassesValue = excludeClassesChild.getValue();
-            excludeClassesValue = "org.glassfish.jersey.server.ResourceConfig" +
-                    (excludeClassesValue != null && excludeClassesValue.isEmpty()
-                            ? "," + excludeClassesValue
-                            : ""
-                    );
-            excludeClassesChild.setValue(excludeClassesValue);
-        } else {
-            excludeClassesChild = new Xpp3Dom("scanExcludeClasses");
-            excludeClassesChild.setValue("org.glassfish.jersey.server.ResourceConfig");
-            configuration.addChild(excludeClassesChild);
-        }
-
-        Xpp3Dom excludePackagesChild = configuration.getChild("scanExcludePackages");
-        if (excludePackagesChild != null) {
-            String excludeClassesValue = excludePackagesChild.getValue();
-            excludeClassesValue = "org.glassfish.jersey.server.wadl" +
-                    (excludeClassesValue != null && excludeClassesValue.isEmpty()
-                            ? "," + excludeClassesValue
-                            : ""
-                    );
-            excludePackagesChild.setValue(excludeClassesValue);
-        } else {
-            excludePackagesChild = new Xpp3Dom("scanExcludePackages");
-            excludePackagesChild.setValue("org.glassfish.jersey.server.wadl");
-            configuration.addChild(excludePackagesChild);
+        if (scanLibraries == null || scanLibraries.isEmpty()) {
+            addChild(configuration, "scanDependenciesDisable", "true");
         }
 
         removeChild(configuration, "scanLibraries");
@@ -144,7 +113,7 @@ public class GenerateMojo extends GenerateSchemaMojo {
                 .forEach(c -> scanClassesList.add(c.name().toString()));
 
         // add jars from scanLibraries configuration
-        if (scanLibraries != null) {
+        if (scanLibraries != null && !scanLibraries.isEmpty()) {
             scanJars.addAll(scanLibraries);
         }
 
@@ -172,35 +141,40 @@ public class GenerateMojo extends GenerateSchemaMojo {
                 );
     }
 
-    private String[] stringToStringArray(String value) {
-        if (value == null) {
-            return new String[] {};
-        }
-
-        return Arrays.stream(value.split(","))
-                .map(s -> s.replaceAll("\\s+", ""))
-                .filter(s -> !s.isEmpty())
-                .collect(Collectors.toList())
-                .toArray(new String[] {});
+    private void addChild(Xpp3Dom configuration, String name, String value) {
+        addChild(configuration, name, value, false);
     }
 
-    private void removeChild(Xpp3Dom configuration, String childName) {
+    private void addChild(Xpp3Dom configuration, String name, String value, boolean appendValue) {
+        Xpp3Dom child = configuration.getChild(name);
+        if (child != null) {
+            if (appendValue) {
+                String currentValue = child.getValue();
+                child.setValue(value +
+                        (currentValue != null && currentValue.isEmpty()
+                                ? "," + currentValue
+                                : ""
+                        )
+                );
+            } else {
+                child.setValue(value);
+            }
+        } else {
+            child = new Xpp3Dom(name);
+            child.setValue(value);
+            configuration.addChild(child);
+        }
+    }
+
+    private void removeChild(Xpp3Dom configuration, String name) {
         int i = 0;
 
         for (Xpp3Dom child : configuration.getChildren()) {
-            if (child.getName().equals(childName)) {
+            if (child.getName().equals(name)) {
                 configuration.removeChild(i);
                 break;
             }
             i++;
         }
-    }
-
-    private boolean isRunningInJar() {
-        return mavenProject.getBuildPlugins().stream()
-                .filter(p -> p.getKey().equals("com.kumuluz.ee:kumuluzee-maven-plugin"))
-                .flatMap(p -> p.getExecutions().stream())
-                .flatMap(e -> e.getGoals().stream())
-                .anyMatch(g -> g.equals("repackage"));
     }
 }

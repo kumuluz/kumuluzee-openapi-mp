@@ -12,6 +12,7 @@
         <module>core</module>
         <module>ui</module>
         <module>tools</module>
+        <module>common</module>
     </modules>
 
     <name>KumuluzEE OpenAPI MicroProfile Parent</name>
@@ -35,11 +36,10 @@
         <kumuluzee-arquillian-container.version>1.1.0</kumuluzee-arquillian-container.version>
 
         <microprofile-openapi.version>1.1.2</microprofile-openapi.version>
-        <smallrye-open-api.version>2.0.13</smallrye-open-api.version>
+        <smallrye-open-api.version>2.0.14</smallrye-open-api.version>
         <classgraph.version>4.8.90</classgraph.version>
-        <swagger-ui.version>3.35.2</swagger-ui.version>
+        <swagger-ui.version>3.36.1</swagger-ui.version>
         <maven-project.version>2.2.1</maven-project.version>
-        <mojo-executor.version>2.3.1</mojo-executor.version>
 
         <testng.version>6.9.9</testng.version>
         <org.mockito.version>3.3.3</org.mockito.version>
@@ -51,6 +51,7 @@
         <surefire.plugin.version>2.22.1</surefire.plugin.version>
         <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
         <download-maven-plugin.version>1.4.2</download-maven-plugin.version>
+        <maven-plugin.version>3.6.0</maven-plugin.version>
 
         <guava.version>29.0-jre</guava.version>
     </properties>
@@ -135,9 +136,9 @@
                 <version>${maven-project.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.twdata.maven</groupId>
-                <artifactId>mojo-executor</artifactId>
-                <version>${mojo-executor.version}</version>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-core</artifactId>
+                <version>${maven-project.version}</version>
             </dependency>
 
             <dependency>

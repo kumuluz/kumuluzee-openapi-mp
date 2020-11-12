@@ -55,6 +55,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Generates OpenAPI schema
@@ -237,8 +238,8 @@ public class GenerateMojo extends AbstractMojo {
     private ClassLoader getClassLoader() throws MojoExecutionException {
         try {
             List<String> classpathElements = (List<String>) mavenProject.getCompileClasspathElements();
-            classpathElements.add(mavenProject.getBuild().getOutputDirectory() );
-            classpathElements.add(mavenProject.getBuild().getTestOutputDirectory() );
+            classpathElements.add(mavenProject.getBuild().getOutputDirectory());
+            classpathElements.add(mavenProject.getBuild().getTestOutputDirectory());
             URL[] urls = new URL[classpathElements.size()];
 
             for ( int i = 0; i < classpathElements.size(); ++i ) {
@@ -281,21 +282,16 @@ public class GenerateMojo extends AbstractMojo {
                 scanJars.addAll(scanLibraries);
             }
 
-            if (scanJars.isEmpty()) {
-                // running exploded with no scan-libraries defined in config
-                classGraph.disableJarScanning();
-            } else {
-                for (Artifact artifact : (Set<Artifact>) mavenProject.getArtifacts()) {
-                    String artifactId = artifact.getArtifactId();
-                    String version = artifact.getVersion();
+            for (Artifact artifact : (Set<Artifact>) mavenProject.getArtifacts()) {
+                String artifactId = artifact.getArtifactId();
+                String version = artifact.getVersion();
 
-                    if (scanJars.contains(artifactId) || scanJars.contains(artifactId + "-" + version + ".jar")) {
-                        try {
-                            Result result = JarIndexer.createJarIndex(artifact.getFile(), new Indexer(), false, false, false);
-                            indexList.add(result.getIndex());
-                        } catch (Exception e) {
-                            // do nothing
-                        }
+                if (scanJars.contains(artifactId) || scanJars.contains(artifactId + "-" + version + ".jar")) {
+                    try {
+                        Result result = JarIndexer.createJarIndex(artifact.getFile(), new Indexer(), false, false, false);
+                        indexList.add(result.getIndex());
+                    } catch (Exception e) {
+                        // do nothing
                     }
                 }
             }
@@ -312,6 +308,14 @@ public class GenerateMojo extends AbstractMojo {
                         }
                     }
                 }
+            }
+        }
+
+        if (scanPackages == null || scanPackages.isEmpty()) {
+            try {
+                scanPackages = getModulePackages();
+            } catch (IOException e) {
+                // do nothing
             }
         }
 
@@ -356,11 +360,10 @@ public class GenerateMojo extends AbstractMojo {
 
         ClassInfoList classInfoList = scanResult.getAllClasses();
         Indexer indexer = new Indexer();
-        ClassLoader classLoader = getClass().getClassLoader();
 
         for (ClassInfo classInfo : classInfoList) {
             try {
-                indexer.index(classLoader.getResourceAsStream(classInfo.getName().replaceAll("\\.", "/") + ".class"));
+                indexer.index(Files.newInputStream(Paths.get(classesDir.toString() + "/" + classInfo.getName().replaceAll("\\.", "/") + ".class")));
             } catch (IOException e) {
                 if (debug) {
                     getLog().warn("Skipped scanning class: " + classInfo.getName());
@@ -378,13 +381,29 @@ public class GenerateMojo extends AbstractMojo {
     // index the classes of this Maven module
     private Index indexModuleClasses() throws IOException {
         Indexer indexer = new Indexer();
-        List<Path> classFiles = Files.walk(classesDir.toPath())
-                .filter(path -> path.toString().endsWith(".class"))
-                .collect(Collectors.toList());
-        for (Path path : classFiles) {
-            indexer.index(Files.newInputStream(path));
+
+        try (Stream<Path> stream = Files.walk(classesDir.toPath())) {
+            List<Path> classFiles = stream
+                    .filter(path -> path.toString().endsWith(".class"))
+                    .collect(Collectors.toList());
+
+            for (Path path : classFiles) {
+                indexer.index(Files.newInputStream(path));
+            }
         }
+
         return indexer.complete();
+    }
+
+    private List<String> getModulePackages() throws IOException {
+        return Files.walk(classesDir.toPath())
+                .filter(path -> path.toString().endsWith(".class"))
+                .map(path -> path.subpath(classesDir.toPath().getNameCount(), path.getNameCount()))
+                .map(path -> path.toString().replaceAll("/", "\\."))
+                .map(clazz -> clazz.substring(0, clazz.lastIndexOf(".")))
+                .map(clazz -> clazz.substring(0, clazz.lastIndexOf(".")))
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     private OpenApiDocument generateSchema(IndexView index) throws IOException {

@@ -23,12 +23,10 @@ package com.kumuluz.ee.openapi.mp.spi;
 import org.eclipse.microprofile.openapi.OASFilter;
 
 /**
- * A SPI interface for registering additional filters, applied after schema generation.
- *
- * @author Urban Malc
- * @since 1.3.0
+ * @author Benjamin Kastelic
+ * @since 1.4.0
  */
-public interface OasFilterProvider {
+public interface ConfigurableOASFilter extends OASFilter {
 
-    OASFilter registerOasFilter();
+    void configure(String key, String value);
 }

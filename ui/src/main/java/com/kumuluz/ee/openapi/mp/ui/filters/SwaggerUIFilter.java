@@ -51,12 +51,10 @@ public class SwaggerUIFilter implements Filter {
 
     private static final Logger LOG = Logger.getLogger(SwaggerUIFilter.class.getName());
 
-
     private static final String X_ORIGINAL_URI = "X-Original-URI";
     private static final String OAUTH_QUERY = "&oauth2RedirectUrl=";
     private static final String URL_QUERY = "/?url=";
     private static final List<String> LOCAL_HOST_ALIASES = Arrays.asList("localhost", "loopback", "127.0.0.1", "[::1]");
-
 
     private String specUrl;
     private String uiPath;

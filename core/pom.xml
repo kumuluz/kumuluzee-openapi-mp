@@ -15,6 +15,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.kumuluz.ee.openapi</groupId>
+            <artifactId>kumuluzee-openapi-mp-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.kumuluz.ee</groupId>
             <artifactId>kumuluzee-common</artifactId>
             <scope>provided</scope>
@@ -43,16 +49,7 @@
         </dependency>
         <dependency>
             <groupId>io.smallrye</groupId>
-            <artifactId>smallrye-open-api-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.smallrye</groupId>
             <artifactId>smallrye-open-api-jaxrs</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.github.classgraph</groupId>
-            <artifactId>classgraph</artifactId>
         </dependency>
 
         <dependency>

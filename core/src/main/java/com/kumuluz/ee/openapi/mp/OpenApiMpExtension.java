@@ -30,7 +30,7 @@ import com.kumuluz.ee.common.utils.ResourceUtils;
 import com.kumuluz.ee.common.wrapper.KumuluzServerWrapper;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import com.kumuluz.ee.jetty.JettyServletServer;
-import com.kumuluz.ee.openapi.mp.spi.OasFilterProvider;
+import com.kumuluz.ee.openapi.mp.spi.OASFilterProvider;
 import com.kumuluz.ee.openapi.mp.utils.JarUtils;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
@@ -210,7 +210,7 @@ public class OpenApiMpExtension implements Extension {
             openApiDocument.modelFromAnnotations(OpenApiProcessor.modelFromAnnotations(config, getIndex(config)));
         }
         openApiDocument.filter(OpenApiProcessor.getFilter(config, classLoader));
-        for (OasFilterProvider filterProvider : ServiceLoader.load(OasFilterProvider.class)) {
+        for (OASFilterProvider filterProvider : ServiceLoader.load(OASFilterProvider.class)) {
             openApiDocument.filter(filterProvider.registerOasFilter());
         }
         openApiDocument.initialize();

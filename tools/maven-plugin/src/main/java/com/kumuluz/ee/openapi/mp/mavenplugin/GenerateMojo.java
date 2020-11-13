@@ -266,7 +266,7 @@ public class GenerateMojo extends AbstractMojo {
         // disable Jersey ResourceConfig
         classGraph.rejectClasses("org.glassfish.jersey.server.ResourceConfig");
 
-        IndexView moduleIndex;
+        Index moduleIndex;
         try {
             moduleIndex = indexModuleClasses();
             indexList.add(moduleIndex);
@@ -312,11 +312,7 @@ public class GenerateMojo extends AbstractMojo {
         }
 
         if (scanPackages == null || scanPackages.isEmpty()) {
-            try {
-                scanPackages = getModulePackages();
-            } catch (IOException e) {
-                // do nothing
-            }
+            scanPackages = getAllIndexPackages(indexList);
         }
 
         // include/exclude according to configuration defined in MP spec
@@ -395,13 +391,10 @@ public class GenerateMojo extends AbstractMojo {
         return indexer.complete();
     }
 
-    private List<String> getModulePackages() throws IOException {
-        return Files.walk(classesDir.toPath())
-                .filter(path -> path.toString().endsWith(".class"))
-                .map(path -> path.subpath(classesDir.toPath().getNameCount(), path.getNameCount()))
-                .map(path -> path.toString().replaceAll("/", "\\."))
-                .map(clazz -> clazz.substring(0, clazz.lastIndexOf(".")))
-                .map(clazz -> clazz.substring(0, clazz.lastIndexOf(".")))
+    private List<String> getAllIndexPackages(List<IndexView> indexList) {
+        return indexList.stream()
+                .flatMap(i -> i.getKnownClasses().stream())
+                .map(ci -> ci.name().prefix().toString())
                 .distinct()
                 .collect(Collectors.toList());
     }

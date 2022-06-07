@@ -1,5 +1,5 @@
 # KumuluzEE OpenAPI MicroProfile
-[![Build Status](https://img.shields.io/travis/kumuluz/kumuluzee-openapi-mp/master.svg?style=flat)](https://travis-ci.org/kumuluz/kumuluzee-openapi-mp)
+[![KumuluzEE CI](https://github.com/kumuluz/kumuluzee-openapi-mp/actions/workflows/kumuluzee-ci.yml/badge.svg)](https://github.com/kumuluz/kumuluzee-openapi-mp/actions/workflows/kumuluzee-ci.yml)
 
 > KumuluzEE OpenAPI MicroProfile project provides powerful tools to incorporate the OpenAPI 3 specification to your
 microservices in a standardized way.

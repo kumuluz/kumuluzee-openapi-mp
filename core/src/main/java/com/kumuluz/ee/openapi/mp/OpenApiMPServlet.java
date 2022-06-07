@@ -20,6 +20,7 @@
  */
 package com.kumuluz.ee.openapi.mp;
 
+import com.kumuluz.ee.openapi.mp.util.MediaTypeUtil;
 import io.smallrye.openapi.api.OpenApiDocument;
 import io.smallrye.openapi.runtime.io.Format;
 import io.smallrye.openapi.runtime.io.OpenApiSerializer;
@@ -28,7 +29,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
@@ -48,21 +48,27 @@ public class OpenApiMPServlet extends HttpServlet {
         PrintWriter writer = resp.getWriter();
         if (OpenApiDocument.INSTANCE.isSet()) {
 
-            // by default use yaml
-            Format format = Format.YAML;
-
-            // respect Accept header
-            if (req.getHeader("Accept").equals(MediaType.APPLICATION_JSON)) {
-                format = Format.JSON;
-            }
+            Format format = null;
 
             // format query parameter can override format
-            if (req.getParameter("format") != null) {
-                if (req.getParameter("format").equalsIgnoreCase("json")) {
+            String queryParameterFormat = req.getParameter("format");
+            if (queryParameterFormat != null) {
+                if (queryParameterFormat.equalsIgnoreCase("json")) {
                     format = Format.JSON;
-                } else {
+                } else if (queryParameterFormat.equalsIgnoreCase("yml") ||
+                        queryParameterFormat.equalsIgnoreCase("yaml")) {
                     format = Format.YAML;
                 }
+            }
+
+            if (format == null) {
+                // respect Accept header
+                format = MediaTypeUtil.parseMediaType(req.getHeader("Accept"));
+            }
+
+            if (format == null) {
+                // by default use yaml
+                format = Format.YAML;
             }
 
             resp.setStatus(HttpServletResponse.SC_OK);

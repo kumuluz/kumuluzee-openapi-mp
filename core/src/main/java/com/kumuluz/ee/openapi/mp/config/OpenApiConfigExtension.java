@@ -49,11 +49,6 @@ public class OpenApiConfigExtension implements ConfigExtension {
     }
 
     @Override
-    public ConfigurationSource getConfigurationSource() {
-        return null;
-    }
-
-    @Override
     public List<ConfigurationSource> getConfigurationSources() {
         return Collections.singletonList(new KumuluzConfigMapper());
     }

@@ -2,7 +2,6 @@ package com.kumuluz.ee.openapi.mp.ui.filters;
 
 import org.eclipse.microprofile.openapi.models.servers.Server;
 import org.eclipse.microprofile.openapi.models.servers.ServerVariable;
-import org.eclipse.microprofile.openapi.models.servers.ServerVariables;
 
 import java.util.Collections;
 import java.util.Map;
@@ -39,12 +38,17 @@ public class CustomServer implements Server {
     }
 
     @Override
-    public ServerVariables getVariables() {
-        return null;
+    public Map<String, ServerVariable> getVariables() {
+        return Collections.emptyMap();
     }
 
     @Override
-    public void setVariables(ServerVariables variables) {
+    public Server addVariable(String s, ServerVariable serverVariable) {
+        return this;
+    }
+
+    @Override
+    public void removeVariable(String s) {
     }
 
     @Override

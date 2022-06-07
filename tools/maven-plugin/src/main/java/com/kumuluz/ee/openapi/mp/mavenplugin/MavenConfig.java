@@ -102,11 +102,6 @@ public class MavenConfig implements OpenApiConfig {
     }
 
     @Override
-    public boolean schemaReferencesEnable() {
-        return Boolean.parseBoolean(properties.getOrDefault(OpenApiConstants.SMALLRYE_SCHEMA_REFERENCES_ENABLE, "true"));
-    }
-
-    @Override
     public String customSchemaRegistryClass() {
         return properties.getOrDefault(OpenApiConstants.SMALLRYE_CUSTOM_SCHEMA_REGISTRY_CLASS, null);
     }
@@ -173,5 +168,15 @@ public class MavenConfig implements OpenApiConfig {
             return OperationIdStrategy.valueOf(strategy);
         }
         return null;
+    }
+
+    @Override
+    public Set<String> getScanProfiles() {
+        return asCsvSet(properties.getOrDefault(OpenApiConstants.SCAN_PROFILES, null));
+    }
+
+    @Override
+    public Set<String> getScanExcludeProfiles() {
+        return asCsvSet(properties.getOrDefault(OpenApiConstants.SCAN_EXCLUDE_PROFILES, null));
     }
 }

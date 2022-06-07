@@ -50,6 +50,8 @@ public class DependencyAppender implements MavenDependencyAppender {
                 versionsBundle.getString("classgraph.version"));
         libs.add("javax.xml.bind:jaxb-api:" +
                 versionsBundle.getString("jaxb-api.version"));
+        libs.add("com.beust:jcommander:" +
+                versionsBundle.getString("jcommander.version"));
 
         return libs;
     }

@@ -175,9 +175,6 @@ public class GenerateMojo extends AbstractMojo {
     @Parameter(property = "scanDependenciesJars")
     private List<String> scanDependenciesJars;
 
-    @Parameter(property = "schemaReferencesEnable")
-    private Boolean schemaReferencesEnable;
-
     @Parameter(property = "customSchemaRegistryClass")
     private String customSchemaRegistryClass;
 
@@ -216,6 +213,12 @@ public class GenerateMojo extends AbstractMojo {
 
     @Parameter(property = "operationIdStrategy")
     private String operationIdStrategy;
+
+    @Parameter(property = "scanProfiles")
+    private List<String> scanProfiles;
+
+    @Parameter(property = "scanExcludeProfiles")
+    private List<String> scanExcludeProfiles;
 
     @Override
     public void execute() throws MojoExecutionException {
@@ -508,7 +511,6 @@ public class GenerateMojo extends AbstractMojo {
         addToPropertyMap(cp, OASConfig.SERVERS_OPERATION_PREFIX, operationServers);
         addToPropertyMap(cp, OpenApiConstants.SMALLRYE_SCAN_DEPENDENCIES_DISABLE, scanDependenciesDisable);
         addToPropertyMap(cp, OpenApiConstants.SMALLRYE_SCAN_DEPENDENCIES_JARS, scanDependenciesJars);
-        addToPropertyMap(cp, OpenApiConstants.SMALLRYE_SCHEMA_REFERENCES_ENABLE, schemaReferencesEnable);
         addToPropertyMap(cp, OpenApiConstants.SMALLRYE_CUSTOM_SCHEMA_REGISTRY_CLASS, customSchemaRegistryClass);
         addToPropertyMap(cp, OpenApiConstants.SMALLRYE_APP_PATH_DISABLE, applicationPathDisable);
         addToPropertyMap(cp, OpenApiConstants.VERSION, openApiVersion);
@@ -522,6 +524,8 @@ public class GenerateMojo extends AbstractMojo {
         addToPropertyMap(cp, OpenApiConstants.INFO_LICENSE_NAME, infoLicenseName);
         addToPropertyMap(cp, OpenApiConstants.INFO_LICENSE_URL, infoLicenseUrl);
         addToPropertyMap(cp, OpenApiConstants.OPERATION_ID_STRAGEGY, operationIdStrategy);
+        addToPropertyMap(cp, OpenApiConstants.SCAN_PROFILES, scanProfiles);
+        addToPropertyMap(cp, OpenApiConstants.SCAN_EXCLUDE_PROFILES, scanExcludeProfiles);
 
         return cp;
     }

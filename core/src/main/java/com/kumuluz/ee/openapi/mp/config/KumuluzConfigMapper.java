@@ -24,6 +24,7 @@ import com.kumuluz.ee.configuration.ConfigurationSource;
 import com.kumuluz.ee.configuration.utils.ConfigurationDispatcher;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,37 +67,28 @@ public class KumuluzConfigMapper implements ConfigurationSource {
     }
 
     @Override
-    public Optional<Boolean> getBoolean(String key) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Integer> getInteger(String key) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Long> getLong(String key) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Double> getDouble(String key) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Float> getFloat(String key) {
-        return Optional.empty();
-    }
-
-    @Override
     public Optional<Integer> getListSize(String key) {
+
+        if (key.startsWith(MP_PREFIX)) {
+            return configurationUtil.getListSize(KUMULUZ_PREFIX + key.substring(MP_PREFIX.length()));
+        }
+
         return Optional.empty();
     }
 
     @Override
     public Optional<List<String>> getMapKeys(String key) {
+
+        if ("".equals(key)) {
+            return Optional.of(Collections.singletonList("mp"));
+        } else if ("mp".equals(key)) {
+            return Optional.of(Collections.singletonList("openapi"));
+        } else if ("mp.openapi".equals(key)) {
+            return configurationUtil.getMapKeys("kumuluzee.openapi-mp");
+        } else if (key.startsWith(MP_PREFIX)) {
+            return configurationUtil.getMapKeys(KUMULUZ_PREFIX + key.substring(MP_PREFIX.length()));
+        }
+
         return Optional.empty();
     }
 

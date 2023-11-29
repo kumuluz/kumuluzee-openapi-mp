@@ -48,8 +48,10 @@ public class DependencyAppender implements MavenDependencyAppender {
                 versionsBundle.getString("smallrye-open-api.version"));
         libs.add("io.github.classgraph:classgraph:" +
                 versionsBundle.getString("classgraph.version"));
-        libs.add("javax.xml.bind:jaxb-api:" +
-                versionsBundle.getString("jaxb-api.version"));
+        libs.add("com.sun.xml.bind:jaxb-impl:" +
+                versionsBundle.getString("jaxb-impl.version"));
+        libs.add("jakarta.xml.bind:jakarta.xml.bind-api:" +
+                versionsBundle.getString("jakarta-xml-bind-api.version"));
         libs.add("com.beust:jcommander:" +
                 versionsBundle.getString("jcommander.version"));
 

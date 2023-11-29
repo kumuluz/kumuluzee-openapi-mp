@@ -49,13 +49,11 @@ import org.jboss.jandex.Indexer;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * MicroProfile OpenAPI extension.
@@ -233,18 +231,18 @@ public class OpenApiMpExtension implements Extension {
                         .orElse(true));
     }
 
-    private String[] patternToStringArray(Pattern pattern) {
+    private String[] patternToStringArray(Set<String> pattern) {
         if (pattern == null) {
-            return new String[] {};
+            return new String[]{};
         }
 
-        return Arrays.stream(pattern.pattern().split("\\|"))
+        return pattern.stream()
                 .map(s -> s.replaceAll("\\(", ""))
                 .map(s -> s.replaceAll("\\)", ""))
                 .map(s -> s.replaceAll("\\\\Q", ""))
                 .map(s -> s.replaceAll("\\\\E", ""))
                 .filter(s -> !s.isEmpty())
-                .collect(Collectors.toList())
-                .toArray(new String[] {});
+                .toList()
+                .toArray(new String[]{});
     }
 }

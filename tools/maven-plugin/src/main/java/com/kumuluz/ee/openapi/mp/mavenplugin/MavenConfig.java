@@ -22,6 +22,8 @@ package com.kumuluz.ee.openapi.mp.mavenplugin;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import org.eclipse.microprofile.openapi.OASConfig;
@@ -42,6 +44,16 @@ public class MavenConfig implements OpenApiConfig {
     }
 
     @Override
+    public <R, T> T getConfigValue(String s, Class<R> aClass, Function<R, T> function, Supplier<T> supplier) {
+        return null;
+    }
+
+    @Override
+    public <R, T> Map<String, T> getConfigValueMap(String s, Class<R> aClass, Function<R, T> function) {
+        return null;
+    }
+
+    @Override
     public String modelReader() {
         return properties.getOrDefault(OASConfig.MODEL_READER, null);
     }
@@ -57,48 +69,8 @@ public class MavenConfig implements OpenApiConfig {
     }
 
     @Override
-    public Pattern scanPackages() {
-        return patternOf(properties.getOrDefault(OASConfig.SCAN_PACKAGES, null));
-    }
-
-    @Override
-    public Pattern scanClasses() {
-        return patternOf(properties.getOrDefault(OASConfig.SCAN_CLASSES, null));
-    }
-
-    @Override
-    public Pattern scanExcludePackages() {
-        return patternOf(properties.getOrDefault(OASConfig.SCAN_EXCLUDE_PACKAGES, null), OpenApiConstants.NEVER_SCAN_PACKAGES);
-    }
-
-    @Override
-    public Pattern scanExcludeClasses() {
-        return patternOf(properties.getOrDefault(OASConfig.SCAN_EXCLUDE_CLASSES, null), OpenApiConstants.NEVER_SCAN_CLASSES);
-    }
-
-    @Override
-    public Set<String> servers() {
-        return asCsvSet(properties.getOrDefault(OASConfig.SERVERS, null));
-    }
-
-    @Override
-    public Set<String> pathServers(String path) {
-        return asCsvSet(properties.getOrDefault(OASConfig.SERVERS_PATH_PREFIX + path, null));
-    }
-
-    @Override
-    public Set<String> operationServers(String operationId) {
-        return asCsvSet(properties.getOrDefault(OASConfig.SERVERS_OPERATION_PREFIX + operationId, null));
-    }
-
-    @Override
     public boolean scanDependenciesDisable() {
         return Boolean.parseBoolean(properties.getOrDefault(OpenApiConstants.SMALLRYE_SCAN_DEPENDENCIES_DISABLE, "false"));
-    }
-
-    @Override
-    public Set<String> scanDependenciesJars() {
-        return asCsvSet(properties.getOrDefault(OpenApiConstants.SMALLRYE_SCAN_DEPENDENCIES_JARS, null));
     }
 
     @Override
@@ -171,12 +143,7 @@ public class MavenConfig implements OpenApiConfig {
     }
 
     @Override
-    public Set<String> getScanProfiles() {
-        return asCsvSet(properties.getOrDefault(OpenApiConstants.SCAN_PROFILES, null));
-    }
+    public void setAllowNakedPathParameter(Boolean aBoolean) {
 
-    @Override
-    public Set<String> getScanExcludeProfiles() {
-        return asCsvSet(properties.getOrDefault(OpenApiConstants.SCAN_EXCLUDE_PROFILES, null));
     }
 }

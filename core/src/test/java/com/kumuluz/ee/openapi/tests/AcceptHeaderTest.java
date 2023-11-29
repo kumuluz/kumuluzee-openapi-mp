@@ -21,6 +21,7 @@
 package com.kumuluz.ee.openapi.tests;
 
 import io.restassured.RestAssured;
+import jakarta.ws.rs.core.MediaType;
 import org.hamcrest.Matcher;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -31,7 +32,6 @@ import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import javax.ws.rs.core.MediaType;
 import java.util.regex.Pattern;
 
 import static io.restassured.RestAssured.given;
@@ -66,9 +66,9 @@ public class AcceptHeaderTest extends Arquillian {
     public void acceptNoHeaderTest() {
         given()
                 .noFilters()
-        .when()
+                .when()
                 .get("/openapi")
-        .then()
+                .then()
                 .log().ifValidationFails()
                 .statusCode(200)
                 .body(isYaml());
@@ -80,9 +80,9 @@ public class AcceptHeaderTest extends Arquillian {
         given()
                 .noFilters()
                 .header("Accept", "text/yaml")
-        .when()
+                .when()
                 .get("/openapi")
-        .then()
+                .then()
                 .log().ifValidationFails()
                 .statusCode(200)
                 .body(isYaml());
@@ -94,9 +94,9 @@ public class AcceptHeaderTest extends Arquillian {
         given()
                 .noFilters()
                 .header("Accept", MediaType.APPLICATION_JSON)
-        .when()
+                .when()
                 .get("/openapi")
-        .then()
+                .then()
                 .log().ifValidationFails()
                 .statusCode(200)
                 .body("openapi", matchesPattern("3\\.\\d+\\.\\d+"));
@@ -108,9 +108,9 @@ public class AcceptHeaderTest extends Arquillian {
         given()
                 .noFilters()
                 .header("Accept", MediaType.APPLICATION_JSON)
-        .when()
+                .when()
                 .get("/openapi?format=yaml")
-        .then()
+                .then()
                 .log().ifValidationFails()
                 .statusCode(200)
                 .body(isYaml());
@@ -122,9 +122,9 @@ public class AcceptHeaderTest extends Arquillian {
         given()
                 .noFilters()
                 .header("Accept", "text/yaml")
-        .when()
+                .when()
                 .get("/openapi?format=json")
-        .then()
+                .then()
                 .log().ifValidationFails()
                 .statusCode(200)
                 .body("openapi", matchesPattern("3\\.\\d+\\.\\d+"));

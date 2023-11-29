@@ -7,7 +7,7 @@
     <groupId>com.kumuluz.ee.openapi</groupId>
     <artifactId>kumuluzee-openapi-mp-parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.0-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <modules>
         <module>core</module>
         <module>ui</module>
@@ -25,37 +25,38 @@
     <url>https://ee.kumuluz.com</url>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <jaxb-api.version>2.3.1</jaxb-api.version>
+        <jakarta-xml-bind-api.version>4.0.1</jakarta-xml-bind-api.version>
+        <jaxb-impl.version>4.0.4</jaxb-impl.version>
 
-        <kumuluzee.version>4.1.0-SNAPSHOT</kumuluzee.version>
-        <kumuluzee-config-mp.version>2.0.0-SNAPSHOT</kumuluzee-config-mp.version>
-        <kumuluzee-arquillian-container.version>1.1.1</kumuluzee-arquillian-container.version>
+        <kumuluzee.version>5.0.0-SNAPSHOT</kumuluzee.version>
+        <kumuluzee-config-mp.version>3.0.0-SNAPSHOT</kumuluzee-config-mp.version>
+        <kumuluzee-arquillian-container.version>2.0.0-SNAPSHOT</kumuluzee-arquillian-container.version>
 
-        <microprofile-openapi.version>2.0.1</microprofile-openapi.version>
-        <smallrye-open-api.version>2.1.22</smallrye-open-api.version>
-        <classgraph.version>4.8.147</classgraph.version>
-        <swagger-ui.version>3.52.5</swagger-ui.version>
-        <maven-core.version>3.8.5</maven-core.version>
+        <microprofile-openapi.version>3.1.1</microprofile-openapi.version>
+        <smallrye-open-api.version>3.7.0</smallrye-open-api.version>
+        <classgraph.version>4.8.164</classgraph.version>
+        <swagger-ui.version>5.9.4</swagger-ui.version>
+        <maven-core.version>3.9.5</maven-core.version>
 
-        <testng.version>6.14.3</testng.version>
-        <arquillian.version>1.6.0.Final</arquillian.version>
-        <org.mockito.version>3.12.4</org.mockito.version>
-        <assertj.version>3.23.1</assertj.version>
+        <testng.version>7.8.0</testng.version>
+        <arquillian.version>1.8.0.Final</arquillian.version>
+        <org.mockito.version>5.7.0</org.mockito.version>
+        <assertj.version>3.24.2</assertj.version>
         <jcommander.version>1.82</jcommander.version>
 
-        <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
-        <nexus.staging.plugin.version>1.6.8</nexus.staging.plugin.version>
-        <gpg.plugin.version>1.6</gpg.plugin.version>
-        <surefire.plugin.version>2.22.1</surefire.plugin.version>
-        <maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
-        <download-maven-plugin.version>1.6.8</download-maven-plugin.version>
-        <maven-plugin-plugin.version>3.6.4</maven-plugin-plugin.version>
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <nexus.staging.plugin.version>1.6.13</nexus.staging.plugin.version>
+        <gpg.plugin.version>3.1.0</gpg.plugin.version>
+        <surefire.plugin.version>3.2.2</surefire.plugin.version>
+        <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+        <download-maven-plugin.version>1.7.1</download-maven-plugin.version>
+        <maven-plugin-plugin.version>3.10.2</maven-plugin-plugin.version>
 
-        <guava.version>29.0-jre</guava.version>
+        <guava.version>32.1.3-jre</guava.version>
     </properties>
 
     <scm>

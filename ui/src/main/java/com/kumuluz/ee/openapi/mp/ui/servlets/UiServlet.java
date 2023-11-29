@@ -20,12 +20,11 @@
  */
 package com.kumuluz.ee.openapi.mp.ui.servlets;
 
+import jakarta.servlet.UnavailableException;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 import org.eclipse.jetty.util.resource.Resource;
-
-import javax.servlet.UnavailableException;
 
 /**
  * Static file server for Swagger UI, modified to remove relative UI path when looking for resources.

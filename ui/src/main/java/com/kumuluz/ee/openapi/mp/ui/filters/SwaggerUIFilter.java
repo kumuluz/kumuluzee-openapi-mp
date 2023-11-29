@@ -23,14 +23,14 @@ package com.kumuluz.ee.openapi.mp.ui.filters;
 import com.google.common.annotations.VisibleForTesting;
 import com.kumuluz.ee.configuration.utils.ConfigurationUtil;
 import io.smallrye.openapi.api.OpenApiDocument;
+import jakarta.annotation.Nullable;
+import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.microprofile.openapi.models.OpenAPI;
 import org.eclipse.microprofile.openapi.models.servers.Server;
 
-import javax.annotation.Nullable;
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
@@ -79,7 +79,7 @@ public class SwaggerUIFilter implements Filter {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         HttpServletResponse httpServletResponse = (HttpServletResponse) servletResponse;
 
-        String path = httpServletRequest.getContextPath()+httpServletRequest.getServletPath();
+        String path = httpServletRequest.getContextPath() + httpServletRequest.getServletPath();
 
         // check if request is for UI
         if (path.contains(uiPath)) {
@@ -119,7 +119,7 @@ public class SwaggerUIFilter implements Filter {
             return rootPath + uiPath + URL_QUERY + rootUrl + specPath + OAUTH_QUERY + rootUrl + uiPath + OAUTH_HTML_PAGE;
         } catch (Exception e) {
             LOG.warning("Failed to dynamically resolve redirect from request header, " +
-                                "falling back to static configuration. Reason of failure: " + e.getMessage());
+                    "falling back to static configuration. Reason of failure: " + e.getMessage());
             return getStaticRedirect();
         }
     }

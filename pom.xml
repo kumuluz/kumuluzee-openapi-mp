@@ -44,7 +44,7 @@
         <testng.version>6.14.3</testng.version>
         <arquillian.version>1.6.0.Final</arquillian.version>
         <org.mockito.version>3.12.4</org.mockito.version>
-        <assertj.version>3.23.1</assertj.version>
+        <assertj.version>3.27.7</assertj.version>
         <jcommander.version>1.82</jcommander.version>
 
         <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
